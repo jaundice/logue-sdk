@@ -40,114 +40,63 @@
 
 #include "usermodfx.h"
 #include "wavefolder.hpp"
+float MaxLimit;
+float MinLimit;
+float Aggression;
+float Gain;
 
-float Delta(float aggression, float delta) 
+void MODFX_INIT(uint32_t platform, uint32_t api)
 {
-	return powf(delta, aggression);
-}
-
-float UnderMin(float min_limit, float aggression, float sample) 
-{
-	float s = sample;
-
-	const float d = min_limit - s;
-
-	s = min_limit + Delta(aggression, d);
-
-	return s;
-}
-
-
-float OverMax(float max_limit, float aggression, float sample)
-{
-	float s = sample;
-
-	const float d = s - max_limit;
-
-	s = max_limit - Delta(aggression, d);
-
-	return s;
-}
-
-  float MaxLimit;
-	float MinLimit;
-	float Aggression;
-  float Gain;
-
-  
-
-
-
-
-
-	float Fold(float maxLimit, float minLimit, float aggression, float sample)
-	{
-		if (sample >= minLimit && sample <= maxLimit)
-		{
-			return sample;
-		}
-
-		float s = sample;
-
-		do
-		{
-			if (s > maxLimit)
-			{
-				s = OverMax(maxLimit, aggression, s);
-			}
-			else
-			{
-				s = UnderMin(minLimit, aggression, s);
-			}
-		}
-		while (s > maxLimit || s < minLimit);
-
-
-		return s;
-	}
-
-	float Process(float sample) 
-	{
-		return Gain *	Fold(MaxLimit, MinLimit, Aggression, sample);
-	}
-
-void MODFX_INIT(uint32_t platform, uint32_t api){
   (void)platform;
   (void)api;
 
-    MaxLimit =1.f;
-    MinLimit =-1.f;
-    Aggression =1.f;
-    Gain = 1.f;
+  MaxLimit = 1.f;
+  MinLimit = -1.f;
+  Aggression = 1.f;
+  Gain = 1.f;
 }
 
-void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames){
-   q31_t * __restrict y = (q31_t *)main_yn;
-  const q31_t * y_e = y + frames;
-  
-  for (; y != y_e; ) {
-    *(++main_yn) = Process(*(++main_xn));
+void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
+{
+  q31_t *__restrict y = (q31_t *)main_yn;
+  const q31_t *y_e = y + frames;
+
+  for (; y != y_e;)
+  {
+
+    float s = (*(++main_xn));
+
+    if (!(s >= MinLimit && s <= MaxLimit))
+    {
+      do
+      {
+        s = s > MaxLimit? MaxLimit - fastpowf(s - MaxLimit, Aggression) : MinLimit + fastpowf(MinLimit - s, Aggression);
+      } while (s > MaxLimit || s < MinLimit);
+    }
+
+    s = Gain * s;
+
+    *(++main_yn) = s;
   }
 }
 
 void MODFX_PARAM(uint8_t index, int32_t value)
 {
-    float val = q31_to_f32(value);
+  float val = q31_to_f32(value);
 
-    switch(index){
-      case 1:{
-        MaxLimit = val;
-        MinLimit = -1 * val; 
-        Gain = 1.f / val;
-        break;
-
-      }
-      case 2:{
-        Aggression =val;
-        break;
-      }
+  switch (index)
+  {
+    case 1:
+    {
+      MaxLimit = val;
+      MinLimit = -1.f * val;
+      Gain = 1.f / val;
+      break;
     }
-
+    case 2:
+    {
+      Aggression = val;
+      break;
+    }
+  }
 }
-
-

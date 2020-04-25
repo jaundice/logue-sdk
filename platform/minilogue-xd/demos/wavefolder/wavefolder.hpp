@@ -40,5 +40,3 @@
  */
 
 #include "usermodfx.h"
-
-#define param_val_to_f32(val) ((uint16_t)val * 9.77517106549365e-004f)  
