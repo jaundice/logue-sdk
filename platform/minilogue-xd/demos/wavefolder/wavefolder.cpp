@@ -57,18 +57,37 @@ float Gain;
 
 float Delta(float delta)
 {
-  return fastpowf(delta, Aggression);
+  return fastpowf(fabs(delta), Aggression);
+}
+
+inline float Folder(float s)
+{
+  return s > MaxLimit ? MaxLimit - Delta(s - MaxLimit) : MinLimit + Delta(MinLimit - s);
 }
 
 inline float Fold(float s)
 {
   if (!(s > MinLimit && s < MaxLimit))
   {
-    do
-    {
-      s = s > MaxLimit ? MaxLimit - Delta(s - MaxLimit) : MinLimit + Delta(MinLimit - s);
-    } while (s > MaxLimit || s < MinLimit);
+    s = Folder(s);
   }
+  if (!(s > MinLimit && s < MaxLimit))
+  {
+    s = Folder(s);
+  }
+  if (!(s > MinLimit && s < MaxLimit))
+  {
+    s = Folder(s);
+  }
+  if (!(s > MinLimit && s < MaxLimit))
+  {
+    s = Folder(s);
+  }
+  if (!(s > MinLimit && s < MaxLimit))
+  {
+    s = fmax(MinLimit, fmin(MaxLimit, s)); //we are bouncing high and low too much so we just clip
+  }
+
   return s;
 }
 
@@ -82,6 +101,10 @@ void MODFX_INIT(uint32_t platform, uint32_t api)
   Aggression = 1.f;
   Gain = 1.f;
 }
+float prevL = 0;
+float prevR = 0;
+
+float slewRate = 0.9f;
 
 void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
 {
@@ -103,33 +126,39 @@ void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, fl
     float s2 = Gain * (*mx++);
 
     ///s = Gain * s;
-    float invGain = 1.f / Gain;
+    float invGain = 1.f; //1.f / Gain;
+    float left = Fold(s);
+    float right = Fold(s2);
 
-    *(my++) = fmax(-1, fmin(1,  invGain * Fold(s)));
-    *(my++) = fmax(-1, fmin(1, invGain * Fold(s2)));
+    float slewLeft = slewRate * s + (1.f - slewRate) * prevL;
+    float slewRight = slewRate * s2 + (1.f - slewRate) * prevR;
+
+    prevL = s;
+    prevR = s2;
+
+    *(my++) = fmax(-1, fmin(1, invGain * slewLeft));
+    *(my++) = fmax(-1, fmin(1, invGain * slewRight));
   }
 }
 
 void MODFX_PARAM(uint8_t index, int32_t value)
 {
-  float val = q31_to_f32(value);
+  float val = fabs(q31_to_f32(value));
 
   switch (index)
   {
   case 0:
   {
-    val *= 0.9f;
+    val *= 0.99f;
     val = 1.f - val;
     MaxLimit = val;
     MinLimit = -1.f * val;
-    Gain = 1.f / val;
+    Gain = 1.f / fmax(0.0001f, val);
     break;
   }
   case 1:
   {
-    val *= 0.9;
-    val = 1.f - val;
-    Aggression = 0.2f + 5 * val;
+    Aggression = 0.5f + 10 * (1.f - val);
     break;
   }
   }
