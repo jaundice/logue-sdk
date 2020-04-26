@@ -57,7 +57,7 @@ float Gain;
 
 float Delta(float delta)
 {
-  return fastpowf(fabs(delta), Aggression);
+  return fasterpowf(fabs(delta), Aggression);
 }
 
 inline float Folder(float s)
