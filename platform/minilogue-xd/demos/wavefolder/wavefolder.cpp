@@ -67,25 +67,36 @@ inline float Folder(float s)
 
 inline float Fold(float s)
 {
-  if (!(s > MinLimit && s < MaxLimit))
+  if (s > MinLimit && s < MaxLimit)
+    return s;
+
+  if (s < MinLimit || s > MaxLimit)
   {
     s = Folder(s);
   }
-  if (!(s > MinLimit && s < MaxLimit))
+  if (s < MinLimit || s > MaxLimit)
   {
     s = Folder(s);
   }
-  if (!(s > MinLimit && s < MaxLimit))
+  if (s < MinLimit || s > MaxLimit)
   {
     s = Folder(s);
   }
-  if (!(s > MinLimit && s < MaxLimit))
+  if (s < MinLimit || s > MaxLimit)
+  {
+    s = Folder(s);
+  }  
+  if (s < MinLimit || s > MaxLimit)
   {
     s = Folder(s);
   }
-  if (!(s > MinLimit && s < MaxLimit))
+  if (s < MinLimit || s > MaxLimit)
   {
-    s = fmax(MinLimit, fmin(MaxLimit, s)); //we are bouncing high and low too much so we just clip
+    s = Folder(s);
+  }
+  if (s < MinLimit || s > MaxLimit)
+  {
+    s = fx_softclipf(0, s); //fmax(MinLimit, fmin(MaxLimit, s)); //we are bouncing high and low too much so we just clip
   }
 
   return s;
@@ -101,10 +112,8 @@ void MODFX_INIT(uint32_t platform, uint32_t api)
   Aggression = 1.f;
   Gain = 1.f;
 }
-float prevL = 0;
-float prevR = 0;
 
-float slewRate = 0.9f;
+float slewRate = 1.f;
 
 void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
 {
@@ -115,6 +124,7 @@ void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, fl
   const float *sx = sub_xn;
   float *__restrict sy = sub_yn;
 
+  float invGain = 1.f / Gain;
   // Loop through the samples
   for (; my != my_e;)
   {
@@ -125,19 +135,11 @@ void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, fl
     float s = Gain * (*mx++);
     float s2 = Gain * (*mx++);
 
-    ///s = Gain * s;
-    float invGain = 1.f; //1.f / Gain;
     float left = Fold(s);
     float right = Fold(s2);
 
-    float slewLeft = slewRate * s + (1.f - slewRate) * prevL;
-    float slewRight = slewRate * s2 + (1.f - slewRate) * prevR;
-
-    prevL = s;
-    prevR = s2;
-
-    *(my++) = fmax(-1, fmin(1, invGain * slewLeft));
-    *(my++) = fmax(-1, fmin(1, invGain * slewRight));
+    *(my++) = fx_softclipf(0.95f,  left);
+    *(my++) = fx_softclipf(0.95f, right);
   }
 }
 
@@ -149,16 +151,17 @@ void MODFX_PARAM(uint8_t index, int32_t value)
   {
   case 0:
   {
-    val *= 0.99f;
     val = 1.f - val;
+    val = fmax(0.0001f, val);
+
     MaxLimit = val;
     MinLimit = -1.f * val;
-    Gain = 1.f / fmax(0.0001f, val);
+    Gain = 1.f / val;
     break;
   }
   case 1:
   {
-    Aggression = 0.5f + 10 * (1.f - val);
+    Aggression = 0.5f + (10 * (1.f - val));
     break;
   }
   }
