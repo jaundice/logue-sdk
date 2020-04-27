@@ -36,7 +36,7 @@ class AlienWah
 
 public:
 
-	AlienWah(AlienWahParams* params)
+	inline AlienWah(AlienWahParams* params)
 	{
 		_params = params;
 
@@ -45,22 +45,22 @@ public:
 		int16_t i;
 		for (i = 0; i < WAHBUFFERSIZE; i++) 
 			delaybuf[i] = std::complex<float>(0, 0);
-		lfoskip = _params->freq * 2 * 3.141592653589 / SAMPLERATE;
+		//lfoskip = _params->freq * 2 * 3.141592653589 / SAMPLERATE;
 		t = 0;
 	}
 
-	void Increment() 
+	inline void Increment() 
 	{
 		t++;
-		const float lfo = (1 + fastercosf(t * lfoskip + _params->startphase));
-		c = std::complex<float>(fastercosf(lfo) * _params->fb, fastersinf(lfo) * _params->fb);
+		const float lfo = (1 + fastcosf(t * (_params->freq * 2 * 3.141592653589 / SAMPLERATE) + _params->startphase));
+		c = std::complex<float>(fastcosf(lfo) * _params->fb, fastsinf(lfo) * _params->fb);
 
 		k++;
 		k %= WAHBUFFERSIZE;
 	}
 
 
-	float ProcessSample(float s)
+	inline float ProcessSample(float s)
 	{
 		std::complex<float> outc = c * delaybuf[k] + (1 - _params->fb) * s;
 		delaybuf[k] = outc;
@@ -73,7 +73,7 @@ public:
 		return out;
 	}
 
-	LRSample32F Process(LRSample32F sample)
+	inline LRSample32F Process(LRSample32F sample)
 	{
 		return LRSample32F{
 			ProcessSample(sample.Left),

@@ -93,11 +93,16 @@ void MODFX_PARAM(uint8_t index, int32_t value)
   {
   case 0:
   {
+    _params.delay = (int16_t)fmaxf(1, val * WAHBUFFERSIZE); 
     break;
   }
   case 1:
   {
+    _params.fb = fmaxf(val, 0.0001);
     break;
   }
+  case 2:
+    _params.freq = val*1000.f;
+    break;
   }
 }
