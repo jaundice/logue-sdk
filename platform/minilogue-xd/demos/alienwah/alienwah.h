@@ -6,7 +6,7 @@
 #include "float_math.h"
 
 #define SAMPLERATE 48000
-#define WAHBUFFERSIZE 298
+#define WAHBUFFERSIZE 480
 
 class AlienWahParams
 {
@@ -31,7 +31,7 @@ class AlienWah
 	std::complex<float> delaybuf[WAHBUFFERSIZE];
 	uint32_t t;
 	std::complex<float> c;
-	uint16_t k = 0;
+	uint32_t k = 0;
 
 	float lfo;
 
@@ -49,7 +49,7 @@ class AlienWah
 			c = std::complex<float>(fastercosf(lfo) * _params->fb, fastersinf(lfo) * _params->fb);
 		}
 
-		int16_t delayIdx = (k - _params->delay) % (WAHBUFFERSIZE);
+		int32_t delayIdx = (k - _params->delay - (int32_t)(lfo * _params->delay)) % (WAHBUFFERSIZE);
 
 		const std::complex<float> c = (c * delaybuf[delayIdx]);
 		delaybuf[k] = c;
