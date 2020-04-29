@@ -60,7 +60,7 @@ class AlienWah
 
 	inline float ProcessSample(float s)
 	{
-		return  s * (c + (1.f - _params->fb)* s).real() * 3;
+		return  ceilf(fabsf(s)) * (c + (1.f - _params->fb)* s).real() * 3;
 	}
 
 public:
