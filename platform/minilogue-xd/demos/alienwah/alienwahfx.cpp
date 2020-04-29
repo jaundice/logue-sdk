@@ -84,13 +84,13 @@ void MODFX_PARAM(uint8_t index, int32_t value)
   {
   case 0:
   {
-    _params.lfo.setF0(fmax(0.00001f, val * 300.f), 1.f / SAMPLERATE);
+    _params.lfo.setF0((fastexpf(val*val) -1.f) * 8000.f, 1.f / SAMPLERATE);
     break;
   }
   case 1:
   {
-    _params.delay = (int32_t)fmaxf(1, val * WAHBUFFERSIZE/2.f);
-    _params.fb = val * 5.f ; 
+    _params.delay = (int32_t)fmaxf(1, (val) * WAHBUFFERSIZE/4.f) + 20 /* + WAHBUFFERSIZE/4.f */ ;
+    _params.fb = 1.f + (fastexpf(val*val) -1.f) * 30.f ; 
     break;
   }
   case 2:

@@ -7,7 +7,7 @@
 #include "dsp/simplelfo.hpp"
 
 #define SAMPLERATE 48000
-#define WAHBUFFERSIZE 480
+#define WAHBUFFERSIZE 420
 
 class AlienWahParams
 {
@@ -19,9 +19,9 @@ public:
 
 	AlienWahParams(float f, float fb, int16_t d)
 	{
-		lfo.setF0(f, 1.f/SAMPLERATE);
+		lfo.setF0(f, 1.f / SAMPLERATE);
 		fb = 0.5f;
-		delay = fmin(d, WAHBUFFERSIZE); //static_cast<int32_t>(d/ SAMPLERATE * SAMPLERATE);
+		delay = fmin(d, WAHBUFFERSIZE / 4.f); //static_cast<int32_t>(d/ SAMPLERATE * SAMPLERATE);
 		if (delay < 1)
 			delay = 1;
 	}
@@ -51,16 +51,16 @@ class AlienWah
 		float lfo = _params->lfo.triangle_bi();
 
 		c = std::complex<float>(fastercosf(lfo) * _params->fb, fastersinf(lfo) * _params->fb);
-		
-		int32_t delayIdx = (k - _params->delay /* - (int32_t)(lfo * _params->delay)*/) % (WAHBUFFERSIZE);
 
-		const std::complex<float> c = (c * -delaybuf[delayIdx]);
+		int32_t delayIdx = (k - _params->delay - (int32_t)(lfo * lfo * lfo * _params->delay)) % (WAHBUFFERSIZE);
+
+		const std::complex<float> c = (c * (-1.f * delaybuf[delayIdx]));
 		delaybuf[k] = c;
 	}
 
 	inline float ProcessSample(float s)
 	{
-		return  ceilf(fabsf(s)) * (c + (1.f - _params->fb)* s).real() * 3;
+		return s * (c + ((1.f - _params->fb) * s)).real() * 3;
 	}
 
 public:
@@ -76,8 +76,16 @@ public:
 	inline LRSample32F Process(LRSample32F sample)
 	{
 		Increment();
+
+		float l = ProcessSample(sample.Left);
+		float r = ProcessSample(sample.Right);
+
+		float mono = (sample.Left + sample.Right) / 2.f; //don't mix it out completely
+
+		float invFB = 1.f / _params->fb;
+
 		return LRSample32F{
-			ProcessSample(sample.Left),
-			ProcessSample(sample.Right)};
+			invFB * l -sample.Left /* - (invFB * lfo * mono) */,
+			invFB * r -sample.Right /* - (invFB * lfo * mono) */};
 	}
 };
