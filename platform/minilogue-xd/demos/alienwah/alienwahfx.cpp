@@ -37,8 +37,8 @@
 #include "alienwah.h"
 
 AlienWahParams _params{
-    0.f,
-    0.5f,
+    30.f,
+    1.2f,
     30};
 
 AlienWah _alien(&_params);
@@ -62,7 +62,6 @@ void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, fl
   for (; my != my_e;)
   {
 
-
     // Pass sub through for prologue for now (L,R), you will need a separate filter at least if you want to process this properly
     *(sy++) = *(sx++); // Copy *sy to *sx (Left channel)
     *(sy++) = *(sx++); // Copy *sy to *sx (Right channel)
@@ -70,10 +69,9 @@ void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, fl
     float s = (*mx++);
     float s2 = (*mx++);
 
-    LRSample32F result = _alien.Process(LRSample32F{
-        s, s2});
+    LRSample32F result = _alien.Process(LRSample32F{s, s2});
 
-    *(my++) = fx_softclipf(0.95f,/*  0.5f * s + 0.5f *  */result.Left);
+    *(my++) = fx_softclipf(0.95f, /*  0.5f * s + 0.5f * */ result.Left);
     *(my++) = fx_softclipf(0.95f, /* 0.5f * s2 + 0.5f * */ result.Right);
   }
 }
@@ -86,18 +84,17 @@ void MODFX_PARAM(uint8_t index, int32_t value)
   {
   case 0:
   {
-    _params.freq = fmax(0.00001f, val * 50.f);
- 
-    _params.delay = (int32_t)fmaxf(1, val * WAHBUFFERSIZE);
+    _params.lfo.setF0(fmax(0.00001f, val * 300.f), 1.f / SAMPLERATE);
     break;
   }
   case 1:
   {
-    _params.fb = val * 4.f - 2.f;
+    _params.delay = (int32_t)fmaxf(1, val * WAHBUFFERSIZE/2.f);
+    _params.fb = val * 5.f ; 
     break;
   }
   case 2:
-    
+
     break;
   }
 }

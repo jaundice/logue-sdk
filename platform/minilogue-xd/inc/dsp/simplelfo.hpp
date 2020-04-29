@@ -52,7 +52,7 @@ namespace dsp {
   /**
    * Simple LFO
    */
-  struct SimpleLFO {
+  class SimpleLFO {
     
     /*===========================================================================*/
     /* Types and Data Structures.                                                */
@@ -61,7 +61,7 @@ namespace dsp {
     /*===========================================================================*/
     /* Constructor / Destructor.                                                 */
     /*===========================================================================*/
-
+public:
     /**
      * Default constructor
      */
