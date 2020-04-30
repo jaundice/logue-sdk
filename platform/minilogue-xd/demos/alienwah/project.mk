@@ -8,10 +8,10 @@ UCSRC =
 
 UCXXSRC = alienwahfx.cpp
 
-UINCDIR =
+UINCDIR = ../../../Bytefarm/dsp
 
 UDEFS =
 
 ULIB = 
 
-ULIBDIR =
+ULIBDIR = 

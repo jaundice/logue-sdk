@@ -33,15 +33,16 @@
 
 #include "usermodfx.h"
 #include "alienwahfx.hpp"
+#include "AlienWahModule.h"
 
-#include "alienwah.h"
+// ByteFarm::Dsp::AlienWahParams<420> _params{
+//     30.f,
+//     1.2f,
+//     30};
 
-AlienWahParams _params{
-    30.f,
-    1.2f,
-    30};
+// ByteFarm::Dsp::AlienWah<420> _alien(&_params);
 
-AlienWah _alien(&_params);
+ByteFarm::Dsp::AlienWahModule _module;
 
 void MODFX_INIT(uint32_t platform, uint32_t api)
 {
@@ -51,50 +52,10 @@ void MODFX_INIT(uint32_t platform, uint32_t api)
 
 void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
 {
-  const float *mx = main_xn;
-  float *__restrict my = main_yn;
-  const float *my_e = my + 2 * frames;
-
-  const float *sx = sub_xn;
-  float *__restrict sy = sub_yn;
-
-  // Loop through the samples
-  for (; my != my_e;)
-  {
-
-    // Pass sub through for prologue for now (L,R), you will need a separate filter at least if you want to process this properly
-    *(sy++) = *(sx++); // Copy *sy to *sx (Left channel)
-    *(sy++) = *(sx++); // Copy *sy to *sx (Right channel)
-
-    float s = (*mx++);
-    float s2 = (*mx++);
-
-    LRSample32F result = _alien.Process(LRSample32F{s, s2});
-
-    *(my++) = fx_softclipf(0.95f, /*  0.5f * s + 0.5f * */ result.Left);
-    *(my++) = fx_softclipf(0.95f, /* 0.5f * s2 + 0.5f * */ result.Right);
-  }
+  _module.Process(main_xn, main_yn, sub_xn, sub_yn, frames);
 }
 
 void MODFX_PARAM(uint8_t index, int32_t value)
 {
-  float val = fabs(q31_to_f32(value));
-
-  switch (index)
-  {
-  case 0:
-  {
-    _params.lfo.setF0((fastexpf(val*val) -1.f) * 8000.f, 1.f / SAMPLERATE);
-    break;
-  }
-  case 1:
-  {
-    _params.delay = (int32_t)fmaxf(1, (val) * WAHBUFFERSIZE/4.f) + 20 /* + WAHBUFFERSIZE/4.f */ ;
-    _params.fb = 1.f + (fastexpf(val*val) -1.f) * 30.f ; 
-    break;
-  }
-  case 2:
-
-    break;
-  }
+  _module.UpdateParams(0, index, value);
 }
