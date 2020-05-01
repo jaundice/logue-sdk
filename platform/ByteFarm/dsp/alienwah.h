@@ -58,8 +58,6 @@ public:
 
 	virtual LRSample32F Process(LRSample32F sample) override
 	{
-		Increment();
-
 		float l = ProcessSample(sample.Left);
 		float r = ProcessSample(sample.Right);
 

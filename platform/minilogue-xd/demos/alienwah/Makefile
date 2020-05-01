@@ -54,8 +54,8 @@ GCC_BIN_PATH = /usr/bin
 
 CC   = $(GCC_BIN_PATH)/$(GCC_TARGET)gcc
 CXXC = $(GCC_BIN_PATH)/$(GCC_TARGET)g++
-LD   = $(GCC_BIN_PATH)/$(GCC_TARGET)gcc
-#LD  = $(GCC_BIN_PATH)/$(GCC_TARGET)g++
+#LD   = $(GCC_BIN_PATH)/$(GCC_TARGET)gcc
+LD  = $(GCC_BIN_PATH)/$(GCC_TARGET)g++
 CP   = $(GCC_BIN_PATH)/$(GCC_TARGET)objcopy
 AS   = $(GCC_BIN_PATH)/$(GCC_TARGET)gcc -x assembler-with-cpp
 AR   = $(GCC_BIN_PATH)/$(GCC_TARGET)ar
@@ -74,9 +74,9 @@ DADEFS = -DSTM32F446xE -DCORTEX_USE_FPU=TRUE -DARM_MATH_CM4
 DDEFS = -DSTM32F446xE -DCORTEX_USE_FPU=TRUE -DARM_MATH_CM4 -D__FPU_PRESENT
 
 COPT = -std=c11 -mstructure-size-boundary=8
-CXXOPT = -std=c++11 -fno-rtti -fno-exceptions -fno-non-call-exceptions
+CXXOPT = -std=c++11 -fno-rtti -fno-exceptions -fno-non-call-exceptions 
 
-LDOPT = -Xlinker --just-symbols=$(LDDIR)/main_api.syms
+LDOPT = -Xlinker --just-symbols=$(LDDIR)/main_api.syms -specs=nano.specs -specs=nosys.specs #jd:added -specs(s) to reduce size
 
 CWARN = -W -Wall -Wextra
 CXXWARN =
@@ -88,6 +88,7 @@ OPT += $(FPU_OPTS)
 #OPT += -flto
 
 TOPT = -mthumb -mno-thumb-interwork -DTHUMB_NO_INTERWORKING -DTHUMB_PRESENT
+
 
 
 # #############################################################################

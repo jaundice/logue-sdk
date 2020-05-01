@@ -46,6 +46,6 @@ MEMORY
   SRAM   (rx) : org = 0x20017800, len = 6K
   SDRAM  (rw) : org = 0xC0400000, len = 128K
 }
-
+HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0x3000; /*jd: added HEAP_SIZE*/
 /* Include Rules */
 INCLUDE rules.ld

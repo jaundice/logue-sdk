@@ -1,27 +1,35 @@
 #pragma once
-#include <vector>
 #include "FxModule.h"
+#include "FxElement.h"
 #include "alienwah.h"
 #include "common.h"
 
+namespace ByteFarm
+{
+namespace Dsp
+{
+    
 
-namespace ByteFarm{
-    namespace Dsp{
-        class AlienWahModule : public FxModule{
 
-            static std::vector<FxElementBase*>* GetModules(){
-                std::vector<FxElementBase*>  *mods = new std::vector<FxElementBase*>();
-                //AlienWahParams<50> *p = new AlienWahParams<50>(300.f, 1.2f, 20);
-                //AlienWah<50> *aw = new AlienWah<50>(p);
+class AlienWahModule : public FxModule<1>
+{
 
-                //mods->push_back(aw);
-                return mods;
-            }
+    static FxElementContainer<1>* GetModules()
+    {
 
-            public :
-            AlienWahModule()
-                : FxModule(GetModules()) { 
-            }
-        };
+        AlienWahParams<50> *p = new AlienWahParams<50>(300.f, 1.2f, 20);
+        FxElementBase* aw = (FxElementBase*)new AlienWah<50>(p);
+        FxElementContainer<1>* mods = new FxElementContainer<1>();
+        mods->FxElements[0] = aw;
+
+        return mods;
     }
-}
+
+public:
+    AlienWahModule()
+        : FxModule<1>(GetModules())
+    {
+    }
+};
+} // namespace Dsp
+} // namespace ByteFarm

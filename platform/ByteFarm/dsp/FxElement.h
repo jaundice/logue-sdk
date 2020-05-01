@@ -12,8 +12,8 @@ class FxElementBase
 public:
     virtual void Increment() = 0;
     virtual LRSample32F Process(LRSample32F sample) = 0;
-    virtual ~FxElementBase() {};
-    virtual void UpdateParams(uint8_t paramIndex, int32_t value)=0;
+    virtual ~FxElementBase(){};
+    virtual void UpdateParams(uint8_t paramIndex, int32_t value) = 0;
 };
 
 template <class TParams>
@@ -23,16 +23,20 @@ public:
     const int32_t SampleRate = SAMPLERATE;
     TParams *Params;
 
+    virtual void Increment() override = 0;
+    virtual LRSample32F Process(LRSample32F sample) override = 0;
+    virtual void UpdateParams(uint8_t paramIndex, int32_t value) override = 0;
+
     FxElement(TParams *params)
         : FxElementBase()
     {
         Params = params;
     }
 
-    ~FxElement(){
+    ~FxElement()
+    {
         delete Params;
     }
-
 };
 } // namespace Dsp
 } // namespace ByteFarm

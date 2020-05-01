@@ -1,20 +1,26 @@
 #pragma once
 #include "FxElement.h"
-#include <vector>
 
 namespace ByteFarm
 {
 namespace Dsp
 {
 
+template <size_t ElementCount>
+struct FxElementContainer
+{
+    const uint16_t NumElements = ElementCount;
+    FxElementBase* FxElements[ElementCount];
+};
+
+template <size_t NumElements>
 class FxModule
 {
 
-    std::vector<FxElementBase *> *Elements;
+    FxElementContainer<NumElements>* Elements;
 
 public:
-
-    FxModule(std::vector<FxElementBase *> *elements)
+    FxModule(FxElementContainer<NumElements>* elements)
     {
         Elements = elements;
     }
@@ -41,10 +47,10 @@ public:
 
             ByteFarm::Dsp::LRSample32F result{s, s2};
 
-            for (uint16_t idx = 0; idx < Elements->size(); idx++)
+            for (uint16_t idx = 0; idx < NumElements; idx++)
             {
-                Elements->at(idx)->Increment();
-                result = Elements->at(idx)->Process(result);
+                Elements->FxElements[idx]->Increment();
+                result = Elements->FxElements[idx]->Process(result);
             }
 
             *(my++) = fx_softclipf(0.95f, /*  0.5f * s + 0.5f * */ result.Left);
@@ -54,12 +60,14 @@ public:
 
     virtual void UpdateParams(uint8_t fxElementIndex, uint8_t paramIndex, int32_t value)
     {
-        this->Elements->at(fxElementIndex)->UpdateParams(paramIndex, value);
+        Elements->FxElements[fxElementIndex]->UpdateParams(paramIndex, value);
     }
 
-    ~FxModule(){
-        for(uint8_t i=0;i< this->Elements->size();i++){
-            delete this->Elements->at(i);
+    ~FxModule()
+    {
+        for (uint8_t i = 0; i < NumElements; i++)
+        {
+            delete Elements->FxElements[i];
         }
         delete Elements;
     }

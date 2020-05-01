@@ -156,6 +156,14 @@ SECTIONS
     . = ALIGN(4);
     _usr_sdram_end = .;
   } > SDRAM
+
+   /* heap section */ /*jd:Added heap section */
+  .heap (NOLOAD):
+  {
+      _heap_start = .;
+      . = . + HEAP_SIZE;
+      _heap_end = .;
+  } > SDRAM
   
   /*
   /DISCARD/
