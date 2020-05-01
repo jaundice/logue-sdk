@@ -8,7 +8,7 @@ UCSRC =
 
 UCXXSRC = wavefolder.cpp
 
-UINCDIR =
+UINCDIR = ../../../Bytefarm/dsp
 
 UDEFS =
 

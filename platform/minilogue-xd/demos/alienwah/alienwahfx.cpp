@@ -33,7 +33,7 @@
 
 #include "usermodfx.h"
 #include "alienwahfx.hpp"
-#include "AlienWahModule.h"
+#include "AlienWahModule.hpp"
 
 // ByteFarm::Dsp::AlienWahParams<420> _params{
 //     30.f,

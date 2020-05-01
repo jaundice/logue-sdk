@@ -1,7 +1,7 @@
 #pragma once
-#include "FxModule.h"
-#include "FxElement.h"
-#include "alienwah.h"
+#include "FxModule.hpp"
+#include "FxElement.hpp"
+#include "alienwah.hpp"
 #include "common.h"
 
 namespace ByteFarm

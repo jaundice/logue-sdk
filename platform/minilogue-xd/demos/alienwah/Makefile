@@ -74,7 +74,7 @@ DADEFS = -DSTM32F446xE -DCORTEX_USE_FPU=TRUE -DARM_MATH_CM4
 DDEFS = -DSTM32F446xE -DCORTEX_USE_FPU=TRUE -DARM_MATH_CM4 -D__FPU_PRESENT
 
 COPT = -std=c11 -mstructure-size-boundary=8
-CXXOPT = -std=c++11 -fno-rtti -fno-exceptions -fno-non-call-exceptions  -fno-use-cxa-atexit
+CXXOPT = -std=c++11 -fno-rtti -fno-exceptions -fno-non-call-exceptions  -fno-use-cxa-atexit #jd: added -fno-use-cxa-atexit
 
 LDOPT = -Xlinker --just-symbols=$(LDDIR)/main_api.syms -specs=nano.specs -specs=nosys.specs  #jd:added -specs(s) to reduce size
 

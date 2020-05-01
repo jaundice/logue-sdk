@@ -1,5 +1,5 @@
 #pragma once
-#include "LRSample32F.h"
+#include "LRSample32F.hpp"
 #include "common.h"
 
 namespace ByteFarm

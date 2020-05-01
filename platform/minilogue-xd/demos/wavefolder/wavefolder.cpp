@@ -39,130 +39,22 @@
  */
 
 #include "usermodfx.h"
-#include "wavefolder.hpp"
-float MaxLimit;
-float MinLimit;
-float Aggression;
-float Gain;
+#include "WaveFolderModule.hpp"
 
-// float powf_fast(float a, float b)
-// {
-//   union {
-//     float d;
-//     int x;
-//   } u = {a};
-//   u.x = (int)(b * (u.x - 1064866805) + 1064866805);
-//   return u.d;
-// }
-
-float Delta(float delta)
-{
-  return fasterpowf(fabs(delta), Aggression);
-}
-
-inline float Folder(float s)
-{
-  return s > MaxLimit ? MaxLimit - Delta(s - MaxLimit) : MinLimit + Delta(MinLimit - s);
-}
-
-inline float Fold(float s)
-{
-  if (s > MinLimit && s < MaxLimit)
-    return s;
-
-  if (s < MinLimit || s > MaxLimit)
-  {
-    s = Folder(s);
-  }
-  if (s < MinLimit || s > MaxLimit)
-  {
-    s = Folder(s);
-  }
-  if (s < MinLimit || s > MaxLimit)
-  {
-    s = Folder(s);
-  }
-  if (s < MinLimit || s > MaxLimit)
-  {
-    s = Folder(s);
-  }  
-  if (s < MinLimit || s > MaxLimit)
-  {
-    s = Folder(s);
-  }
-  if (s < MinLimit || s > MaxLimit)
-  {
-    s = Folder(s);
-  }
-  if (s < MinLimit || s > MaxLimit)
-  {
-    s = fx_softclipf(0, s); //fmax(MinLimit, fmin(MaxLimit, s)); //we are bouncing high and low too much so we just clip
-  }
-
-  return s;
-}
+ByteFarm::Dsp::WaveFolderModule _module;
 
 void MODFX_INIT(uint32_t platform, uint32_t api)
 {
   (void)platform;
   (void)api;
-
-  MaxLimit = 1.f;
-  MinLimit = -1.f;
-  Aggression = 1.f;
-  Gain = 1.f;
 }
-
-float slewRate = 1.f;
 
 void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
 {
-  const float *mx = main_xn;
-  float *__restrict my = main_yn;
-  const float *my_e = my + 2 * frames;
-
-  const float *sx = sub_xn;
-  float *__restrict sy = sub_yn;
-
-  float invGain = 1.f / Gain;
-  // Loop through the samples
-  for (; my != my_e;)
-  {
-    // Pass sub through for prologue for now (L,R), you will need a separate filter at least if you want to process this properly
-    *(sy++) = *(sx++); // Copy *sy to *sx (Left channel)
-    *(sy++) = *(sx++); // Copy *sy to *sx (Right channel)
-
-    float s = Gain * (*mx++);
-    float s2 = Gain * (*mx++);
-
-    float left = Fold(s);
-    float right = Fold(s2);
-
-    *(my++) = fx_softclipf(0.95f,  left);
-    *(my++) = fx_softclipf(0.95f, right);
-  }
+  _module.Process(main_xn, main_yn, sub_xn, sub_yn, frames);
 }
 
 void MODFX_PARAM(uint8_t index, int32_t value)
 {
-  float val = fabs(q31_to_f32(value));
-
-  switch (index)
-  {
-  case 0:
-  {
-    val = 1.f - val;
-    val = fmax(0.0001f, val);
-
-    MaxLimit = val;
-    MinLimit = -1.f * val;
-    Gain = 1.f / val;
-    break;
-  }
-  case 1:
-  {
-    Aggression = 0.5f + (10 * (1.f - val));
-    break;
-  }
-  }
+  _module.UpdateParams(0, index, value);
 }

@@ -2,10 +2,10 @@
 #pragma once
 #include <complex>
 #include "usermodfx.h"
-#include "LRSample32F.h"
+#include "LRSample32F.hpp"
 #include "float_math.h"
 #include "dsp/simplelfo.hpp"
-#include "FxElement.h"
+#include "FxElement.hpp"
 #include "common.h"
 
 namespace ByteFarm

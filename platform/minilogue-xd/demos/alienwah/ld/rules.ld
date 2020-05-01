@@ -158,15 +158,7 @@ SECTIONS
   } > SDRAM
 
    /* heap section */ /*jd:Added heap section */
-  /*
-  .heap (NOLOAD):
-  {
-      _heap_start = .;
-      . = . + HEAP_SIZE;
-      _heap_end = .;
-  } > SDRAM
-  */
-  .heap : {
+   .heap : {
     __heap_start__ = .;
     end = __heap_start__;
     _end = end;
