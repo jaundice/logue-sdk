@@ -17,8 +17,8 @@ class AlienWahModule : public FxModule<1>
     static FxElementContainer<1>* GetModules()
     {
 
-        AlienWahParams<50> *p = new AlienWahParams<50>(300.f, 1.2f, 20);
-        FxElementBase* aw = (FxElementBase*)new AlienWah<50>(p);
+        AlienWahParams<420> *p = new AlienWahParams<420>(300.f, 1.2f, 20);
+        FxElementBase* aw = (FxElementBase*)new AlienWah<420>(p);
         FxElementContainer<1>* mods = new FxElementContainer<1>();
         mods->FxElements[0] = aw;
 
