@@ -35,9 +35,12 @@ template <size_t WAHBUFFERSIZE>
 class AlienWah : public FxElement<AlienWahParams<WAHBUFFERSIZE>>
 {
 	std::complex<float> delaybuf[WAHBUFFERSIZE];
+	float sampleBufL[WAHBUFFERSIZE];
+	float sampleBufR[WAHBUFFERSIZE];
 	uint32_t t;
 	std::complex<float> c;
 	uint32_t k = 0;
+	int32_t delayIdx = 0;
 
 	float lfo;
 
@@ -58,16 +61,21 @@ public:
 
 	virtual LRSample32F Process(LRSample32F sample) override
 	{
+
+
 		float l = ProcessSample(sample.Left);
 		float r = ProcessSample(sample.Right);
 
-		float mono = (sample.Left + sample.Right) / 2.f; //don't mix it out completely
+		float invFB = 0.5f / this->Params->fb;
 
-		float invFB = 1.f / this->Params->fb;
+		sampleBufL[k] = l;
+		sampleBufR[k] = r;
+
+		int32_t sidx = (int32_t)((int32_t)k - (int32_t)(lfo * this->Params->delay)) % WAHBUFFERSIZE;
 
 		return LRSample32F{
-			invFB * l - sample.Left /* - (invFB * lfo * mono) */,
-			invFB * r - sample.Right /* - (invFB * lfo * mono) */};
+			invFB * l + invFB * sampleBufR[sidx] /* - sample.Left  - (invFB * lfo * mono) */,
+			invFB * r + invFB * sampleBufL[sidx] /* - sample.Right - (invFB * lfo * mono) */};
 	}
 
 	virtual void Increment() override
@@ -84,7 +92,7 @@ public:
 
 		c = std::complex<float>(fastercosf(lfo) * this->Params->fb, fastersinf(lfo) * this->Params->fb);
 
-		int32_t delayIdx = (k - this->Params->delay - (int32_t)(lfo * lfo * lfo * this->Params->delay)) % (WAHBUFFERSIZE);
+		delayIdx = (k - this->Params->delay /*- (int32_t)(lfo /3.f * this->Params->delay)*/) % (WAHBUFFERSIZE);
 
 		const std::complex<float> c = (c * (-1.f * delaybuf[delayIdx]));
 		delaybuf[k] = c;
@@ -103,7 +111,7 @@ public:
 		}
 		case 1:
 		{
-			this->Params->delay = (int32_t)fmaxf(1, (val)*WAHBUFFERSIZE / 4.f) + 20 /* + WAHBUFFERSIZE/4.f */;
+			this->Params->delay = (int32_t)fmaxf(1, (val)*WAHBUFFERSIZE) /* + WAHBUFFERSIZE/4.f */;
 			this->Params->fb = 1.f + (fastexpf(val * val) - 1.f) * 30.f;
 			break;
 		}
