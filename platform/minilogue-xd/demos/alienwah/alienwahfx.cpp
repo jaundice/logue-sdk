@@ -57,5 +57,5 @@ void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, fl
 
 void MODFX_PARAM(uint8_t index, int32_t value)
 {
-  _module.UpdateParams(0, index, value);
+  _module.UpdateParams(index, value);
 }

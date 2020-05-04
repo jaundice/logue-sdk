@@ -16,7 +16,7 @@ namespace ByteFarm
         template <size_t NumElements>
         class FxModule
         {
-
+        protected:
             FxElementContainer<NumElements> *Elements;
 
         public:
@@ -58,10 +58,7 @@ namespace ByteFarm
                 }
             }
 
-            virtual void UpdateParams(uint8_t fxElementIndex, uint8_t paramIndex, int32_t value)
-            {
-                Elements->FxElements[fxElementIndex]->UpdateParams(paramIndex, value);
-            }
+            virtual void UpdateParams(uint8_t paramIndex, int32_t value) const {};
 
             ~FxModule()
             {

@@ -82,30 +82,6 @@ namespace ByteFarm
                     Fold(sample.Left),
                     Fold(sample.Right)};
             }
-
-            virtual void UpdateParams(uint8_t paramIndex, int32_t value) override
-            {
-                float val = fabs(q31_to_f32(value));
-
-                switch (paramIndex)
-                {
-                case 0:
-                {
-                    val = 1.f - val;
-                    val = fmax(0.0001f, val);
-
-                    Params->MaxLimit = val;
-                    Params->MinLimit = -1.f * val;
-                    Params->Gain = 1.f / val;
-                    break;
-                }
-                case 1:
-                {
-                    Params->Aggression = 0.5f + (10 * (1.f - val));
-                    break;
-                }
-                }
-            };
         }; // namespace Dsp
     }      // namespace Dsp
 } // namespace ByteFarm

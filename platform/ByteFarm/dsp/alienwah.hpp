@@ -98,28 +98,6 @@ public:
 		delaybuf[k] = c;
 	}
 
-	virtual void UpdateParams(uint8_t paramIndex, int32_t value)
-	{
-		float val = fabs(q31_to_f32(value));
-
-		switch (paramIndex)
-		{
-		case 0:
-		{
-			this->Params->lfo.setF0((fastexpf(val * val) - 1.f) * 8000.f, 1.f / SAMPLERATE);
-			break;
-		}
-		case 1:
-		{
-			this->Params->delay = (int32_t)fmaxf(1, (val)*WAHBUFFERSIZE) /* + WAHBUFFERSIZE/4.f */;
-			this->Params->fb = 1.f + (fastexpf(val * val) - 1.f) * 30.f;
-			break;
-		}
-		case 2:
-
-			break;
-		}
-	}
 };
 } // namespace Dsp
 } // namespace ByteFarm
