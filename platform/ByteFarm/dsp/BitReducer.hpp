@@ -2,6 +2,7 @@
 #pragma once
 #include "FxElement.hpp"
 #include "LRSample32F.hpp"
+#include "float_math.h"
 
 namespace ByteFarm
 {
@@ -17,7 +18,7 @@ namespace ByteFarm
 			void SetBits(float bits)
 			{
 				Bits = bits;
-				Quantum = powf(2.0f, bits);
+				Quantum = fastpowf(2.0f, bits);
 			}
 
 			BitReducerParams()
