@@ -22,10 +22,7 @@ namespace ByteFarm
 		{
 		private:
 			volatile uint8_t step = 0;
-			SpeakAndSpellDegraderParams *GetSandSParams()
-			{
-				return static_cast<SpeakAndSpellDegraderParams *>(this->Params);
-			}
+
 
 			LRSample32F _sample{0, 0};
 
@@ -47,6 +44,10 @@ namespace ByteFarm
 				_sample = BitReducer::Process(sample);
 
 				return _sample;
+			}
+			SpeakAndSpellDegraderParams *GetSandSParams()
+			{
+				return static_cast<SpeakAndSpellDegraderParams *>(this->Params);
 			}
 		};
 	} // namespace Dsp
