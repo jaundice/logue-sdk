@@ -1,5 +1,0 @@
-// 
-// 
-// 
-
-#include "SpeakAndSpellDegrader.hpp"

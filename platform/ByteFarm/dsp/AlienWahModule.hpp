@@ -1,7 +1,7 @@
 #pragma once
 #include "FxModule.hpp"
 #include "FxElement.hpp"
-#include "alienwah.hpp"
+#include "AlienWah.hpp"
 #include "common.h"
 
 #define WAHBUFFERSIZE 3200

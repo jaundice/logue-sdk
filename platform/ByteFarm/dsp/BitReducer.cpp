@@ -1,5 +1,0 @@
-// 
-// 
-// 
-
-#include "BitReducer.hpp"

@@ -1,5 +1,0 @@
-// 
-// 
-// 
-
-#include "OnePoleFilter.hpp"
