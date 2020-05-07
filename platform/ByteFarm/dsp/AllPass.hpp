@@ -13,8 +13,8 @@ namespace Dsp
 class AllPassFilterParams
 {
 public:
-    float a;
-    AllPassFilterParams(float aa){
+    double a;
+    AllPassFilterParams(double aa){
         a = aa;
     }
 };
@@ -39,7 +39,7 @@ public:
         x0 = input;
 
         //allpass filter 1
-        const LRSample32F output{x2.Left + ((input.Left - y2.Left) * Params->a), x2.Right + ((input.Right - y2.Right) * Params->a)};
+        const LRSample32F output{x2.Left + (float)((input.Left - y2.Left) * Params->a), x2.Right + (float)((input.Right - y2.Right) * Params->a)};
 
         y0 = output;
 
@@ -58,7 +58,7 @@ public:
     };
 
 private:
-    float a;
+    double a;
 
     LRSample32F x0;
     LRSample32F x1;
@@ -72,13 +72,13 @@ private:
 class AllPassFilterCascade
 {
 public:
-    AllPassFilterCascade(float *coefficients, const uint8_t numCoefficients)
+    AllPassFilterCascade(double *coefficients, const uint8_t numCoefficients)
     {
         numfilters = numCoefficients;
         allpassfilters = (AllPassFilter**)malloc(sizeof(AllPassFilter*) * numCoefficients);
-        for (int i = 0; i < numfilters; i++)
+        for (uint8_t i = 0; i < numfilters; i++)
         {
-            float c = (coefficients)[i];
+            double c = (coefficients)[i];
             AllPassFilterParams *p = new AllPassFilterParams(c);
             AllPassFilter *f = new AllPassFilter(p);
             allpassfilters[i] = f;
@@ -86,7 +86,7 @@ public:
     };
     ~AllPassFilterCascade()
     {
-        for (size_t i = 0; i < numfilters; i++)
+        for (uint8_t i = 0; i < numfilters; i++)
         {
             delete allpassfilters[i];
         }
@@ -95,7 +95,7 @@ public:
 
     virtual void Increment()
     {
-        for (size_t i = 0; i < numfilters; i++)
+        for (uint8_t i = 0; i < numfilters; i++)
         {
             allpassfilters[i]->Increment();
             /* code */
@@ -108,7 +108,7 @@ public:
 
         int i = 0;
 
-        for (size_t i = 0; i < numfilters; i++)
+        for (uint8_t i = 0; i < numfilters; i++)
         {
 
             output = allpassfilters[i]->Process(output);
@@ -120,7 +120,7 @@ public:
 
 private:
     AllPassFilter **allpassfilters;
-    int numfilters;
+    uint8_t numfilters;
 };
 
 enum HalfBandFilterOrder
@@ -156,15 +156,15 @@ enum HalfBandFilterAngle
 class CascadedAllPassFilterParams
 {
 public:
-    float *a_coefficients;
-    float *b_coefficients;
+    double *a_coefficients;
+    double *b_coefficients;
     uint8_t NumCoefficients;
 
     static CascadedAllPassFilterParams *HalfBandFilter(HalfBandFilterOrder order, HalfBandFilterAngle angle)
     {
 
-        float *a;
-        float *b;
+        double *a;
+        double *b;
         uint8_t n;
 
         switch (angle)
@@ -174,33 +174,33 @@ public:
             switch (order)
             {
             case TWELVEPOLE:
-                a = (float *)C12S.a_coefficients.data();
-                b = (float *)C12S.b_coefficients.data();
+                a = (double *)C12S.a_coefficients.data();
+                b = (double *)C12S.b_coefficients.data();
                 n = C12S.NumCoefficients;
                 break;
             case TENPOLE:
-                a = (float *)C10S.a_coefficients.data();
-                b = (float *)C10S.b_coefficients.data();
+                a = (double *)C10S.a_coefficients.data();
+                b = (double *)C10S.b_coefficients.data();
                 n = C10S.NumCoefficients;
                 break;
             case EIGHTPOLE:
-                a = (float *)C8S.a_coefficients.data();
-                b = (float *)C8S.b_coefficients.data();
+                a = (double *)C8S.a_coefficients.data();
+                b = (double *)C8S.b_coefficients.data();
                 n = C8S.NumCoefficients;
                 break;
             case SIXPOLE:
-                a = (float *)C6S.a_coefficients.data();
-                b = (float *)C6S.b_coefficients.data();
+                a = (double *)C6S.a_coefficients.data();
+                b = (double *)C6S.b_coefficients.data();
                 n = C6S.NumCoefficients;
                 break;
             case FOURPOLE:
-                a = (float *)C4S.a_coefficients.data();
-                b = (float *)C4S.b_coefficients.data();
+                a = (double *)C4S.a_coefficients.data();
+                b = (double *)C4S.b_coefficients.data();
                 n = C4S.NumCoefficients;
                 break;
             case TWOPOLE:
-                a = (float *)C2S.a_coefficients.data();
-                b = (float *)C2S.b_coefficients.data();
+                a = (double *)C2S.a_coefficients.data();
+                b = (double *)C2S.b_coefficients.data();
                 n = C2S.NumCoefficients;
                 break;
             default:
@@ -215,33 +215,33 @@ public:
             switch (order)
             {
             case TWELVEPOLE:
-                a = (float *)C12G.a_coefficients.data();
-                b = (float *)C12G.b_coefficients.data();
+                a = (double *)C12G.a_coefficients.data();
+                b = (double *)C12G.b_coefficients.data();
                 n = C12G.NumCoefficients;
                 break;
             case TENPOLE:
-                a = (float *)C10G.a_coefficients.data();
-                b = (float *)C10G.b_coefficients.data();
+                a = (double *)C10G.a_coefficients.data();
+                b = (double *)C10G.b_coefficients.data();
                 n = C10G.NumCoefficients;
                 break;
             case EIGHTPOLE:
-                a = (float *)C8G.a_coefficients.data();
-                b = (float *)C8G.b_coefficients.data();
+                a = (double *)C8G.a_coefficients.data();
+                b = (double *)C8G.b_coefficients.data();
                 n = C8G.NumCoefficients;
                 break;
             case SIXPOLE:
-                a = (float *)C6G.a_coefficients.data();
-                b = (float *)C6G.b_coefficients.data();
+                a = (double *)C6G.a_coefficients.data();
+                b = (double *)C6G.b_coefficients.data();
                 n = C6G.NumCoefficients;
                 break;
             case FOURPOLE:
-                a = (float *)C4G.a_coefficients.data();
-                b = (float *)C4G.b_coefficients.data();
+                a = (double *)C4G.a_coefficients.data();
+                b = (double *)C4G.b_coefficients.data();
                 n = C4G.NumCoefficients;
                 break;
             case TWOPOLE:
-                a = (float *)C2G.a_coefficients.data();
-                b = (float *)C2G.b_coefficients.data();
+                a = (double *)C2G.a_coefficients.data();
+                b = (double *)C2G.b_coefficients.data();
                 n = C2G.NumCoefficients;
                 break;
             default:
