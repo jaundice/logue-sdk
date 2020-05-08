@@ -41,7 +41,7 @@
 #include "usermodfx.h"
 #include "PolyPhaseModule.hpp"
 
-ByteFarm::Dsp::PolyPhaseModule12S _module;
+ByteFarm::Dsp::PolyPhaseMultiModule _module;
 
 void MODFX_INIT(uint32_t platform, uint32_t api)
 {

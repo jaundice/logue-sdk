@@ -33,7 +33,7 @@ public:
     {
     }
 
-    virtual void UpdateParams(uint8_t paramIndex, int32_t value) const override{
+    virtual void UpdateParams(uint8_t paramIndex, int32_t value) override{
         float val = fabs(q31_to_f32(value));
 
         ByteFarm::Dsp::AlienWah<WAHBUFFERSIZE> *aw =  static_cast<ByteFarm::Dsp::AlienWah<WAHBUFFERSIZE>*>(Elements->FxElements[0]);

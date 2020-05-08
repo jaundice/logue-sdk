@@ -25,7 +25,12 @@ public:
     AllPassFilter(AllPassFilterParams *params) : FxElement<AllPassFilterParams>(params)
     {
         //a = coefficient;
+        Reset();
 
+    };
+
+    virtual void Reset() override{
+        
         x0 = LRSample32F{0.f, 0.f};
         x1 = LRSample32F{0.f, 0.f};
         x2 = LRSample32F{0.f, 0.f};
@@ -33,7 +38,8 @@ public:
         y0 = LRSample32F{0.f, 0.f};
         y1 = LRSample32F{0.f, 0.f};
         y2 = LRSample32F{0.f, 0.f};
-    };
+    }
+
     virtual LRSample32F Process(LRSample32F input) override
     {
         x0 = input;

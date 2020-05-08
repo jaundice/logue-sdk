@@ -10,7 +10,16 @@ namespace ByteFarm
         struct FxElementContainer
         {
             const uint16_t NumElements = ElementCount;
-            FxElementBase *FxElements[ElementCount];
+            FxElementBase **FxElements;
+
+            FxElementContainer(){
+                FxElements = (FxElementBase**)(void(*))malloc(sizeof(FxElementBase*)* ElementCount);
+            }
+
+            ~FxElementContainer(){
+                delete FxElements;
+            }
+
         };
 
         template <size_t NumElements>
@@ -25,7 +34,7 @@ namespace ByteFarm
                 Elements = elements;
             }
 
-            void Process(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
+            virtual void Process(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
             {
                 const float *mx = main_xn;
                 float *__restrict my = main_yn;
@@ -58,7 +67,7 @@ namespace ByteFarm
                 }
             }
 
-            virtual void UpdateParams(uint8_t paramIndex, int32_t value) const {};
+            virtual void UpdateParams(uint8_t paramIndex, int32_t value)  {};
 
             ~FxModule()
             {
