@@ -1,18 +1,18 @@
 #include "FxModule.hpp"
 #include "SpeakAndSpellDegrader.hpp"
-
+#include "TypedArray.hpp"
 namespace ByteFarm
 {
     namespace Dsp
     {
 
-        static FxElementContainer<1> *GetModules()
+        static TypedArray<FxElementBase *, 1> *GetModules()
         {
 
             SpeakAndSpellDegraderParams *p = new SpeakAndSpellDegraderParams();
             FxElementBase *aw = (FxElementBase *)new SpeakAndSpellDegrader(p);
-            FxElementContainer<1> *mods = new FxElementContainer<1>();
-            mods->FxElements[0] = aw;
+            TypedArray<FxElementBase *, 1> *mods = new TypedArray<FxElementBase *, 1>();
+            mods->Set(0, aw);
 
             return mods;
         }
@@ -28,12 +28,12 @@ namespace ByteFarm
             {
                 float val = fabs(q31_to_f32(value));
 
-                ByteFarm::Dsp::SpeakAndSpellDegrader *wf = static_cast<ByteFarm::Dsp::SpeakAndSpellDegrader *>(Elements->FxElements[0]);
+                ByteFarm::Dsp::SpeakAndSpellDegrader *wf = static_cast<ByteFarm::Dsp::SpeakAndSpellDegrader *>(Elements->Get(0));
                 switch (paramIndex)
                 {
                 case 0:
                 {
-                    wf->Params->SetBits(1.f + (val*31.f));
+                    wf->Params->SetBits(1.f + (val * 31.f));
                     break;
                 }
                 case 1:

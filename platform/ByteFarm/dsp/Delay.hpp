@@ -2,8 +2,7 @@
 #pragma once
 #include "CircularBuffer.hpp"
 #include "FxElement.hpp"
-#include <array>
-#include <vector>
+#include "TypedArray.hpp"
 
 namespace ByteFarm
 {
@@ -18,16 +17,16 @@ namespace ByteFarm
 			volatile long Time;
 		};
 
-		template <std::size_t BufferSize>
+		template <size_t BufferSize>
 		class DelayBase : public FxElement<DelayParams>
 		{
 			CircularBuffer<LRSample32F, BufferSize> _buffer;
-			std::vector<IProcessor *> _delayProcessors;
-			std::vector<IProcessor *> _feedbackProcessors;
+			TypedArray<IProcessor *, BufferSize> _delayProcessors;
+			TypedArray<IProcessor *, BufferSize> _feedbackProcessors;
 			//DelayParams* _params;
 
-			DelayBase(DelayParams *params, std::vector<IProcessor *> delayProcessors[],
-					  std::vector<IProcessor *> feedbackProcessors[]) : FxElement<DelayParams>(params)
+			DelayBase(DelayParams *params, TypedArray<IProcessor *> delayProcessors,
+					  TypedArray<IProcessor *> feedbackProcessors) : FxElement<DelayParams>(params)
 			{
 				//_params = params;
 				_buffer = new CircularBuffer<LRSample32F, BufferSize>();
@@ -69,6 +68,13 @@ namespace ByteFarm
 				_buffer.Write(w);
 
 				return (sample * (1 - this->Params->Mix)) + (w * this->Params->Mix);
+			}
+
+			~DelayBase()
+			{
+				delete _buffer;
+				delete _delayProcessors;
+				delete _feedbackProcessors;
 			}
 		};
 	} // namespace Dsp

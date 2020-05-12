@@ -1,18 +1,19 @@
 #include "FxModule.hpp"
 #include "WaveFolder.hpp"
+#include "TypedArray.hpp"
 
 namespace ByteFarm
 {
     namespace Dsp
     {
 
-        static FxElementContainer<1> *GetModules()
+        static TypedArray<FxElementBase *, 1> *GetModules()
         {
 
             WaveFolderParams *p = new WaveFolderParams();
             FxElementBase *aw = (FxElementBase *)new WaveFolder(p);
-            FxElementContainer<1> *mods = new FxElementContainer<1>();
-            mods->FxElements[0] = aw;
+            TypedArray<FxElementBase *, 1> *mods = new TypedArray<FxElementBase *, 1>();
+            mods->Set(0, aw);
 
             return mods;
         }
@@ -28,7 +29,7 @@ namespace ByteFarm
             {
                 float val = fabs(q31_to_f32(value));
 
-                ByteFarm::Dsp::WaveFolder *wf = static_cast<ByteFarm::Dsp::WaveFolder*>(Elements->FxElements[0]);
+                ByteFarm::Dsp::WaveFolder *wf = static_cast<ByteFarm::Dsp::WaveFolder *>(Elements->Get(0));
                 switch (paramIndex)
                 {
                 case 0:

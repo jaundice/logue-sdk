@@ -66,9 +66,8 @@ namespace ByteFarm
             }
 
         public:
-            WaveFolder(WaveFolderParams *params):FxElement<WaveFolderParams>(params)
+            WaveFolder(WaveFolderParams *params) : FxElement<WaveFolderParams>(params)
             {
-
             }
 
             virtual void Increment() override
@@ -82,6 +81,6 @@ namespace ByteFarm
                     Fold(sample.Left),
                     Fold(sample.Right)};
             }
-        }; // namespace Dsp
-    }      // namespace Dsp
+        };
+    } // namespace Dsp
 } // namespace ByteFarm

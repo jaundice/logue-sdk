@@ -1,35 +1,20 @@
 #pragma once
 #include "FxElement.hpp"
+#include "TypedArray.hpp"
 
 namespace ByteFarm
 {
     namespace Dsp
     {
 
-        template <size_t ElementCount>
-        struct FxElementContainer
-        {
-            const uint16_t NumElements = ElementCount;
-            FxElementBase **FxElements;
-
-            FxElementContainer(){
-                FxElements = (FxElementBase**)(void(*))malloc(sizeof(FxElementBase*)* ElementCount);
-            }
-
-            ~FxElementContainer(){
-                delete FxElements;
-            }
-
-        };
-
         template <size_t NumElements>
         class FxModule
         {
         protected:
-            FxElementContainer<NumElements> *Elements;
+            TypedArray<FxElementBase *, NumElements> *Elements;
 
         public:
-            FxModule(FxElementContainer<NumElements> *elements)
+            FxModule(TypedArray<FxElementBase *, NumElements> *elements)
             {
                 Elements = elements;
             }
@@ -58,8 +43,8 @@ namespace ByteFarm
 
                     for (uint16_t idx = 0; idx < NumElements; idx++)
                     {
-                        Elements->FxElements[idx]->Increment();
-                        result = Elements->FxElements[idx]->Process(result);
+                        Elements->Get(idx)->Increment();
+                        result = Elements->Get(idx)->Process(result);
                     }
 
                     *(my++) = fx_softclipf(0.95f, /*  0.5f * s + 0.5f * */ result.Left);
@@ -67,13 +52,13 @@ namespace ByteFarm
                 }
             }
 
-            virtual void UpdateParams(uint8_t paramIndex, int32_t value)  {};
+            virtual void UpdateParams(uint8_t paramIndex, int32_t value){};
 
             ~FxModule()
             {
                 for (uint8_t i = 0; i < NumElements; i++)
                 {
-                    delete Elements->FxElements[i];
+                    delete Elements;
                 }
                 delete Elements;
             }

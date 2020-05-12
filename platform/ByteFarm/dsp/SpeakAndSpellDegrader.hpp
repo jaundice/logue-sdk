@@ -23,7 +23,6 @@ namespace ByteFarm
 		private:
 			volatile uint8_t step = 0;
 
-
 			LRSample32F _sample{0, 0};
 
 		public:

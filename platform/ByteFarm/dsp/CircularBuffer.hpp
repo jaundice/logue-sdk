@@ -1,6 +1,6 @@
 // CircularBuffer.h
 #pragma once
-#include <array>
+#include "TypedArray.hpp"
 
 namespace ByteFarm
 {
@@ -8,34 +8,30 @@ namespace ByteFarm
 	{
 
 		template <class T, std::size_t S>
-		class CircularBuffer
+		class CircularBuffer : public TypedArray<T, S>
 		{
-			std::array<T, S> _buffer();
 
 			volatile long _writeIndex = 0;
 
-			CircularBuffer()
+			CircularBuffer() : TypedArray<T, S>()
 			{
 			}
 
 		public:
 			T Read(long offset)
 			{
-				long idx = (_writeIndex + offset) % _buffer.size();
-
-				idx = idx > 0 ? idx : _buffer.size() + idx;
-
-				return _buffer[idx];
+				long idx = (_writeIndex + offset);
+				return Get(idx);
 			}
 
 			void Write(T value)
 			{
-				_buffer[_writeIndex] = value;
+				Set(_writeIndex % S, value);
 			}
 
 			void Increment()
 			{
-				_writeIndex = ++_writeIndex % _buffer.size();
+				_writeIndex = ++_writeIndex % S;
 			}
 		};
 	} // namespace Dsp
