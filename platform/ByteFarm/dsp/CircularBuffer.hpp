@@ -7,13 +7,13 @@ namespace ByteFarm
 	namespace Dsp
 	{
 
-		template <class T, std::size_t S>
-		class CircularBuffer : public TypedArray<T, S>
+		template <class T, std::size_t S, class intType>
+		class CircularBuffer : public TypedArray<T, S, intType>
 		{
 
 			volatile long _writeIndex = 0;
 
-			CircularBuffer() : TypedArray<T, S>()
+			CircularBuffer() : TypedArray<T, S, intType>()
 			{
 			}
 

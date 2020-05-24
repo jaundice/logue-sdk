@@ -1,4 +1,5 @@
 #pragma once
+#include "FxElement.hpp"
 #include "FxModule.hpp"
 #include "AllPass.hpp"
 #include "TypedArray.hpp"
@@ -8,10 +9,10 @@ namespace ByteFarm
 	namespace Dsp
 	{
 
-		TypedArray<FxElementBase *, 1> *GetElements(HalfBandFilterOrder order, HalfBandFilterAngle angle)
+		TypedArray<FxElementBase *, 1, uint8_t> *GetElements(HalfBandFilterOrder order, HalfBandFilterAngle angle)
 		{
 
-			TypedArray<FxElementBase *, 1> *elements = new TypedArray<FxElementBase *, 1>();
+			TypedArray<FxElementBase *, 1, uint8_t> *elements = new TypedArray<FxElementBase *, 1, uint8_t>();
 
 			CascadedAllPassFilterParams *p = CascadedAllPassFilterParams::HalfBandFilter(order, angle);
 			HalfBandFilter *hbf = new HalfBandFilter(p);
@@ -27,10 +28,10 @@ namespace ByteFarm
 			return hbf;
 		}
 
-		TypedArray<FxElementBase *, 12> *GetAllElements()
+		TypedArray<FxElementBase *, 12, uint8_t> *GetAllElements()
 		{
 
-			TypedArray<FxElementBase *, 12> *elements = new TypedArray<FxElementBase *, 12>();
+			TypedArray<FxElementBase *, 12, uint8_t> *elements = new TypedArray<FxElementBase *, 12, uint8_t>();
 
 			elements->Set(0, GetFilter(HalfBandFilterOrder::TWOPOLE, HalfBandFilterAngle::GENTLE));
 			elements->Set(1, GetFilter(HalfBandFilterOrder::FOURPOLE, HalfBandFilterAngle::GENTLE));

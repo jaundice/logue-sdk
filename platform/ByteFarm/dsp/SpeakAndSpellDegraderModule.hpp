@@ -6,12 +6,12 @@ namespace ByteFarm
     namespace Dsp
     {
 
-        static TypedArray<FxElementBase *, 1> *GetModules()
+        static TypedArray<FxElementBase *, 1, uint8_t> *GetModules()
         {
 
             SpeakAndSpellDegraderParams *p = new SpeakAndSpellDegraderParams();
             FxElementBase *aw = (FxElementBase *)new SpeakAndSpellDegrader(p);
-            TypedArray<FxElementBase *, 1> *mods = new TypedArray<FxElementBase *, 1>();
+            TypedArray<FxElementBase *, 1, uint8_t> *mods = new TypedArray<FxElementBase *, 1, uint8_t>();
             mods->Set(0, aw);
 
             return mods;

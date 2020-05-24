@@ -1,0 +1,4 @@
+C:\Users\John\Documents\GitHub\logue-sdk\WaveTableBuilder\WaveTableBuilder\Debug\WaveTableBuilder.exe
+C:\Users\John\Documents\GitHub\logue-sdk\WaveTableBuilder\WaveTableBuilder\Debug\WaveTableBuilder.pdb
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTableBuilder\Debug\WaveTableBuilder.exe
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTableBuilder\Debug\WaveTableBuilder.pdb

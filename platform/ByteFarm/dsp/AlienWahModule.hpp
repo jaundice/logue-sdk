@@ -5,7 +5,7 @@
 #include "common.h"
 #include "TypedArray.hpp"
 
-#define WAHBUFFERSIZE 3200
+#define WAHBUFFERSIZE 2048
 
 namespace ByteFarm
 {
@@ -15,12 +15,12 @@ namespace ByteFarm
         class AlienWahModule : public FxModule<1>
         {
 
-            static TypedArray<FxElementBase *, 1> *GetModules()
+            static TypedArray<FxElementBase *, 1, uint8_t> *GetModules()
             {
 
                 AlienWahParams<WAHBUFFERSIZE> *p = new AlienWahParams<WAHBUFFERSIZE>(300.f, 1.2f, 20);
                 FxElementBase *aw = (FxElementBase *)new AlienWah<WAHBUFFERSIZE>(p);
-                TypedArray<FxElementBase *, 1> *mods = new TypedArray<FxElementBase *, 1>();
+                TypedArray<FxElementBase *, 1, uint8_t> *mods = new TypedArray<FxElementBase *, 1, uint8_t>();
                 mods->Set(0, aw);
 
                 return mods;
@@ -42,13 +42,13 @@ namespace ByteFarm
                 {
                 case 0:
                 {
-                    aw->Params->lfo.setF0((fastexpf(val * val) - 1.f) * 8000.f, 1.f / SAMPLERATE);
+                    aw->Params->lfo.setF0((fasterexpf(val * val) - 1.f) * 8000.f, 1.f / SAMPLERATE);
                     break;
                 }
                 case 1:
                 {
                     aw->Params->delay = (int32_t)fmaxf(1, (val)*WAHBUFFERSIZE) /* + WAHBUFFERSIZE/4.f */;
-                    aw->Params->fb = 1.f + (fastexpf(val * val) - 1.f) * 30.f;
+                    aw->Params->fb = 1.f + (fasterexpf(val * val) - 1.f) * 30.f;
                     break;
                 }
                 case 2:

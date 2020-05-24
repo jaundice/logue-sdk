@@ -1,0 +1,10 @@
+﻿  WaveTableBuilder.cpp
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTableBuilder\WaveTableBuilder.cpp(15,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTableBuilder\WaveTableBuilder.cpp(34): message : see reference to function template instantiation 'void PrintTable<1024>(ByteFarm::Tools::Functor,std::string)' being compiled
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTable\WaveTableGenerator.hpp(62,1): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTableBuilder\WaveTableBuilder.cpp(13): message : see reference to function template instantiation 'std::array<float,1024> ByteFarm::Tools::WaveTableGenerator::Generate<1024>(ByteFarm::Tools::Functor)' being compiled
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTableBuilder\WaveTableBuilder.cpp(34): message : see reference to function template instantiation 'void PrintTable<1024>(ByteFarm::Tools::Functor,std::string)' being compiled
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTable\WaveTableGenerator.hpp(72,1): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTable\WaveTableGenerator.hpp(65): message : see reference to function template instantiation 'void ByteFarm::Tools::WaveTableGenerator::Fill<1024>(float *,ByteFarm::Tools::Functor)' being compiled
+C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTableBuilder\WaveTableBuilder.cpp(13): message : see reference to function template instantiation 'std::array<float,1024> ByteFarm::Tools::WaveTableGenerator::Generate<1024>(ByteFarm::Tools::Functor)' being compiled
+  WaveTableBuilder.vcxproj -> C:\Users\John\Documents\GitHub\logue-sdk\platform\ByteFarm\tools\WaveTableBuilder\Debug\WaveTableBuilder.exe

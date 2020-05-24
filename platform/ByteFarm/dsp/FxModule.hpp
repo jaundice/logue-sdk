@@ -11,10 +11,10 @@ namespace ByteFarm
         class FxModule
         {
         protected:
-            TypedArray<FxElementBase *, NumElements> *Elements;
+            TypedArray<FxElementBase *, NumElements, uint8_t> *Elements;
 
         public:
-            FxModule(TypedArray<FxElementBase *, NumElements> *elements)
+            FxModule(TypedArray<FxElementBase *, NumElements, uint8_t> *elements)
             {
                 Elements = elements;
             }

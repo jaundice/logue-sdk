@@ -2,12 +2,25 @@
 #include <initializer_list>
 //#include <assert.h>
 #include <type_traits>
+#include <stdlib.h>
 namespace ByteFarm
 {
     namespace Dsp
     {
 
-        template <class T, size_t sz>
+        template <class T>
+        void Delete(T item)
+        {
+            //do nothing
+        }
+
+        template <class T>
+        void Delete(T *item)
+        {
+            delete item;
+        }
+
+        template <class T, size_t sz, class intType>
         class TypedArray
         {
         private:
@@ -20,7 +33,7 @@ namespace ByteFarm
             }
             TypedArray(std::initializer_list<T> input) : TypedArray()
             {
-                int32_t i = 0;
+                intType i = 0;
 
                 for (const T *t = input.begin(); t < input.end(), i < sz; t++)
                 {
@@ -28,38 +41,36 @@ namespace ByteFarm
                     i++;
                 }
             }
-            T Get(uint32_t idx)
+            T Get(intType idx)
             {
                 return _array[idx % sz];
             }
 
-            void Set(uint32_t idx, T value)
+            void Set(intType idx, T value)
             {
                 _array[idx % sz] = value;
             }
 
-            int32_t size()
+            intType Size()
             {
                 return sz;
             }
 
-            T *data()
+            const T *Ptr()
             {
                 return _array;
             }
 
             ~TypedArray()
             {
-                if (std::is_class<T>::value && std::is_pointer<T>::value)
+                for (intType i = 0; i < sz; i++)
                 {
-                    for (int32_t i = 0; i < sz; i++)
-                    {
-#warning need to implement element deletion but currently the is_class and is_pointer tests aren't working'
-                        //delete _array[i];
-                    }
+                    Delete<T>(_array[i]);
                 }
+
                 delete _array;
             }
         };
+
     } // namespace Dsp
 } // namespace ByteFarm
