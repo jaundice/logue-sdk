@@ -37,7 +37,17 @@ namespace ByteFarm
                 float ret = 0.f;
                 for (uint8_t i = 0; i < NumOcillators; i++)
                 {
-                    ret += Oscillators.Get(i)->NextSample() / NumOcillators /** Envelopes.Get(i)->CurrentValue()*/;
+                    float scale = 1.f;
+                    if (i == 1)
+                    {
+                        scale = 0.25f + Params.ShapeLfo * 0.5f;
+                    }
+                    else if (i == 2)
+                    {
+                        scale = 0.25f + (1.f - Params.ShapeLfo) * 0.5f;
+                    }
+
+                    ret += Oscillators.Get(i)->NextSample() * scale * Envelopes.Get(i)->CurrentValue();
                 }
                 return ret;
             };
@@ -45,9 +55,9 @@ namespace ByteFarm
             virtual void UpdateOscParams(VoiceParams params) override
             {
                 Params = params;
-                Oscillators.Get(0)->SetFreq(NoteToHz(params.NoteNumber - 12u, params.Detune));
+                Oscillators.Get(0)->SetFreq(NoteToHz(params.NoteNumber, params.Detune));
                 Oscillators.Get(1)->SetFreq(NoteToHz(params.NoteNumber, params.Detune + (0.7f * osc_white())));
-                Oscillators.Get(2)->SetFreq(NoteToHz(params.NoteNumber + 12u, params.Detune + (0.6f * osc_white())));
+                Oscillators.Get(2)->SetFreq(NoteToHz(params.NoteNumber, params.Detune + (0.6f * osc_white())));
             };
 
             virtual void NoteOn() override

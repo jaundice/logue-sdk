@@ -25,28 +25,24 @@ namespace ByteFarm
             ByteFarm::Tools::WaveTableGenerator::Fill<LUTSize>(saw->Table, ByteFarm::Tools::CommonWaveTableFunctors::Saw<8>);
             ByteFarm::Tools::WaveTableGenerator::Fill<LUTSize>(tri->Table, ByteFarm::Tools::CommonWaveTableFunctors::Tri<8>);
             //ByteFarm::Tools::WaveTableGenerator::Fill<LUTSize>(sin->Table, ByteFarm::Tools::CommonWaveTableFunctors::Sine);
+
             LUTOsc<LUTSize, SampleRate> *sqrOsc = new LUTOsc<LUTSize, SampleRate>(sqr->Table);
             LUTOsc<LUTSize, SampleRate> *sawOsc = new LUTOsc<LUTSize, SampleRate>(saw->Table);
             LUTOsc<LUTSize, SampleRate> *triOsc = new LUTOsc<LUTSize, SampleRate>(tri->Table);
             //LUTOsc<LUTSize, SampleRate> *sinOsc = new LUTOsc<LUTSize, SampleRate>(sin->Table);
 
             LUTVoice<3, LUTSize, SampleRate> *v = new LUTVoice<3, LUTSize, SampleRate>();
-            // LUTOsc<LUTSize, SampleRate> *sqrOsc = new LUTOsc<LUTSize, SampleRate>(sqr8Partials1024);
-            // LUTOsc<LUTSize, SampleRate> *sawOsc = new LUTOsc<LUTSize, SampleRate>(saw8Partials1024);
-            // LUTOsc<LUTSize, SampleRate> *triOsc = new LUTOsc<LUTSize, SampleRate>(tri8Partials1024);
-          
-          
+
             v->Oscillators.Set(0, sqrOsc);
             v->Oscillators.Set(1, sawOsc);
             v->Oscillators.Set(2, triOsc);
             //v->Oscillators.Set(3, sinOsc);
-          
-          
-            Envelope<SampleRate> *sqrEnv = new Envelope<SampleRate>(Delay|Attack|Hold|Decay|Sustain|Release, 5.f, 2.f, 400.f, 100.f, 5000.f, 0.35f);
-            Envelope<SampleRate> *sawEnv = new Envelope<SampleRate>(Delay|Attack|Hold|Decay|Release|Loop, 50.f, 3.f, 400.f, 100.f, 100.f, 0.5f);
-            Envelope<SampleRate> *triEnv = new Envelope<SampleRate>(Delay|Attack|Hold|Decay|Release|Loop, 100.f, 50.f, 2.f, 2000.f, 1000.f, 0.45f);
+
+            Envelope<SampleRate> *sqrEnv = new Envelope<SampleRate>(Delay | Attack | Hold | Decay | Sustain | Release, 5.f, 2.f, 100.f, 100.f, 5000.f, 0.85f);
+            Envelope<SampleRate> *sawEnv = new Envelope<SampleRate>(Delay | Attack | Hold | Decay | Release | Loop, 75.f, 300.f, 400.f, 7000.f, 5000.f, 0.75f);
+            Envelope<SampleRate> *triEnv = new Envelope<SampleRate>(Delay | Attack | Hold | Decay | Release | Loop, 100.f, 4000.f, 200.f, 2000.f, 1000.f, 0.65f);
             //Envelope<SampleRate> *sinEnv = new Envelope<SampleRate>(Delay|Attack|Hold|Decay|Release|Loop, 100.f, 50.f, 2.f, 2000.f, 1000.f, 0.45f);
-          
+
             v->Envelopes.Set(0, sqrEnv);
             v->Envelopes.Set(1, sawEnv);
             v->Envelopes.Set(2, triEnv);
@@ -68,8 +64,10 @@ namespace ByteFarm
 
             };
 
-            virtual void UpdateOscParams(VoiceParams params) override{
-                for(uint8_t i =0;i<Voices->Size();i++ ){
+            virtual void UpdateOscParams(VoiceParams params) override
+            {
+                for (uint8_t i = 0; i < Voices->Size(); i++)
+                {
                     Voices->Get(i)->UpdateOscParams(params);
                 }
             };

@@ -1,5 +1,4 @@
 #pragma once
-#include "../tools/WaveTable/WaveTableGenerator.hpp"
 
 namespace ByteFarm
 {

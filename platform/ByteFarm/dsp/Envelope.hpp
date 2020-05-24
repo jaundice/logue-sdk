@@ -18,11 +18,16 @@ namespace ByteFarm
 
         inline EnvelopeStage operator|(EnvelopeStage a, EnvelopeStage b)
         {
-            return static_cast<EnvelopeStage>(static_cast<uint16_t>(a) | static_cast<uint16_t>(b));
+            return static_cast<EnvelopeStage>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
         }
         inline EnvelopeStage operator&(EnvelopeStage a, EnvelopeStage b)
         {
-            return static_cast<EnvelopeStage>(static_cast<uint16_t>(a) & static_cast<uint16_t>(b));
+            return static_cast<EnvelopeStage>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
+        }
+
+        bool HasFlag(EnvelopeStage stages, EnvelopeStage test)
+        {
+            return (stages & test) == test;
         }
 
         enum EnvelopeSlope
@@ -35,18 +40,17 @@ namespace ByteFarm
         class Envelope
         {
             const uint16_t FramesPerMs = SampleRate / 1000;
-            EnvelopeStage Stages;
-            EnvelopeSlope Slope;
-
-            uint32_t ElapsedFrames;
-            EnvelopeStage CurrentStage;
-            float Output;
-            float SustainLevel;
+            EnvelopeStage Stages{Off};
+            EnvelopeSlope Slope{EnvelopeSlope::Linear};
+            EnvelopeStage CurrentStage{EnvelopeStage::Off};
+            float Output = 0.0f;
+            float SustainLevel = 0.75f;
             uint32_t DelayFrames = 0;
-            uint32_t DecayFrames = 0;
-            uint32_t AttackFrames = 0;
-            uint32_t HoldFrames = 0;
-            uint32_t ReleaseFrames = 0;
+            uint32_t AttackFrames = 50;
+            uint32_t HoldFrames = 1000;
+            uint32_t DecayFrames = 200;
+            uint32_t ReleaseFrames = 3000;
+            uint32_t ElapsedFrames = 0;
 
             bool NoteDown;
 
@@ -54,40 +58,55 @@ namespace ByteFarm
             {
                 switch (CurrentStage)
                 {
-                case EnvelopeStage::Release:
+                case Off:
+                case Release:
                 {
-                    if (Stages & EnvelopeStage::Loop == EnvelopeStage::Loop)
+                    if (HasFlag(Stages, Loop))
                     {
-                        CurrentStage = Stages & EnvelopeStage::Delay == EnvelopeStage::Delay ? EnvelopeStage::Delay : EnvelopeStage::Attack;
+                        CurrentStage = HasFlag(Stages, Delay) ? Delay : Attack;
                         return;
                     }
 
-                    CurrentStage = EnvelopeStage::Off;
+                    CurrentStage = Off;
                     return;
                 }
-                case EnvelopeStage::Off:
-                {
-                    CurrentStage = Stages & EnvelopeStage::Delay == EnvelopeStage::Delay ? EnvelopeStage::Delay : EnvelopeStage::Attack;
+                case Delay:{
+                    CurrentStage = Attack;
                     return;
                 }
-                case EnvelopeStage::Attack:
+                case Attack:
                 {
-                    CurrentStage = Stages & EnvelopeStage::Hold == EnvelopeStage::Hold ? EnvelopeStage::Hold : EnvelopeStage::Decay;
+                    CurrentStage = HasFlag(Stages, Hold) ? Hold : Decay;
                     return;
                 }
-                case EnvelopeStage::Hold:
+                case Hold:
                 {
-                    CurrentStage = EnvelopeStage::Decay;
+                    CurrentStage = Decay;
                     return;
                 }
-                case EnvelopeStage::Decay:
+                case Decay:
                 {
-                    CurrentStage = Stages & EnvelopeStage::Sustain == EnvelopeStage::Sustain ? EnvelopeStage::Sustain : EnvelopeStage::Release;
+                    if (HasFlag(Stages, Sustain))
+                    {
+                        CurrentStage = Sustain;
+                    }
+                    else if (HasFlag(Stages, Release))
+                    {
+                        CurrentStage = Release;
+                    }
+                    else if (HasFlag(Stages, Loop))
+                    {
+                        CurrentStage = HasFlag(Stages, Delay) ? Delay : Attack;
+                    }
+                    else
+                    {
+                        CurrentStage = Off;
+                    }
                     return;
                 }
-                case EnvelopeStage::Sustain:
+                case Sustain:
                 {
-                    CurrentStage = EnvelopeStage::Release;
+                    CurrentStage = Release;
                     return;
                 }
                 }
@@ -97,8 +116,8 @@ namespace ByteFarm
             {
                 switch (CurrentStage)
                 {
-                case EnvelopeStage::Delay:
-                case EnvelopeStage::Off:
+                case Delay:
+                case Off:
                 {
                     Output = 0.f;
                     return;
@@ -115,7 +134,8 @@ namespace ByteFarm
                 }
                 case Decay:
                 {
-                    Output = 1.f - (1.f - SustainLevel) * (float)ElapsedFrames / (float)DecayFrames;
+                    float lowLevel = HasFlag(Stages, Sustain) ? SustainLevel : 0.f;
+                    Output = 1.f - ((1.f - lowLevel) * (float)ElapsedFrames / (float)DecayFrames);
                     return;
                 }
                 case Sustain:
@@ -125,8 +145,12 @@ namespace ByteFarm
                 }
                 case Release:
                 {
-                    Output = SustainLevel - (SustainLevel) * (float)ElapsedFrames / (float)DecayFrames;
+                    Output = SustainLevel - ((SustainLevel) * (float)ElapsedFrames / (float)ReleaseFrames);
                     return;
+                }
+                default:
+                {
+                    Output = 0.5f;
                 }
                 }
             }
@@ -134,15 +158,15 @@ namespace ByteFarm
         public:
             float CurrentValue()
             {
-                return 1.f;
-                //return Output;
+                //return 1.f;
+                return Output;
             }
 
             void Increment()
             {
                 switch (CurrentStage)
                 {
-                case EnvelopeStage::Delay:
+                case Delay:
                 {
                     if (ElapsedFrames > DelayFrames)
                     {
@@ -151,7 +175,7 @@ namespace ByteFarm
                     }
                     break;
                 }
-                case EnvelopeStage::Attack:
+                case Attack:
                 {
                     if (ElapsedFrames > AttackFrames)
                     {
@@ -160,7 +184,7 @@ namespace ByteFarm
                     }
                     break;
                 }
-                case EnvelopeStage::Hold:
+                case Hold:
                 {
                     if (ElapsedFrames > HoldFrames)
                     {
@@ -169,7 +193,7 @@ namespace ByteFarm
                     }
                     break;
                 }
-                case EnvelopeStage::Decay:
+                case Decay:
                 {
                     if (ElapsedFrames > DecayFrames)
                     {
@@ -178,7 +202,7 @@ namespace ByteFarm
                     }
                     break;
                 }
-                case EnvelopeStage::Sustain:
+                case Sustain:
                 {
                     if (!NoteDown)
                     {
@@ -187,7 +211,7 @@ namespace ByteFarm
                     }
                     break;
                 }
-                case EnvelopeStage::Release:
+                case Release:
                 {
                     if (ElapsedFrames > ReleaseFrames)
                     {
@@ -206,27 +230,27 @@ namespace ByteFarm
             {
                 switch (stage)
                 {
-                case EnvelopeStage::Delay:
+                case Delay:
                 {
                     DelayFrames = milliseconds * FramesPerMs;
                     return;
                 }
-                case EnvelopeStage::Attack:
+                case Attack:
                 {
                     AttackFrames = milliseconds * FramesPerMs;
                     return;
                 }
-                case EnvelopeStage::Hold:
+                case Hold:
                 {
                     HoldFrames = milliseconds * FramesPerMs;
                     return;
                 }
-                case EnvelopeStage::Decay:
+                case Decay:
                 {
                     DecayFrames = milliseconds * FramesPerMs;
                     return;
                 }
-                case EnvelopeStage::Release:
+                case Release:
                 {
                     ReleaseFrames = milliseconds * FramesPerMs;
                     return;
@@ -248,18 +272,20 @@ namespace ByteFarm
             void Reset()
             {
                 ElapsedFrames = 0;
-                CurrentStage = EnvelopeStage::Off;
+                CurrentStage = Off;
                 NoteDown = false;
             }
 
             void NoteOn()
             {
                 NoteDown = true;
-                switch(this->CurrentStage){
-                    case Off:{
-                        CurrentStage = Stages & Delay == Delay ? Delay: Attack;
-                        ElapsedFrames = 0;
-                    }
+                switch (this->CurrentStage)
+                {
+                case Off:
+                {
+                    CurrentStage = HasFlag(Stages, Delay) ? Delay : Attack;
+                    ElapsedFrames = 0;
+                }
                 }
             }
 
