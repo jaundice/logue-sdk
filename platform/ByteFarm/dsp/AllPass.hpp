@@ -13,8 +13,8 @@ namespace ByteFarm
         class AllPassFilterParams
         {
         public:
-            double a;
-            AllPassFilterParams(double aa)
+            float a;
+            AllPassFilterParams(float aa)
             {
                 a = aa;
             }
@@ -45,7 +45,9 @@ namespace ByteFarm
                 x0 = input;
 
                 //allpass filter 1
-                const LRSample32F output{x2.Left + (float)((input.Left - y2.Left) * Params->a), x2.Right + (float)((input.Right - y2.Right) * Params->a)};
+                const LRSample32F output{
+                    x2.Left + (float)((input.Left - y2.Left) * Params->a), 
+                    x2.Right + (float)((input.Right - y2.Right) * Params->a)};
 
                 y0 = output;
 
@@ -64,7 +66,7 @@ namespace ByteFarm
             };
 
         private:
-            double a;
+            float a;
 
             LRSample32F x0;
             LRSample32F x1;
@@ -78,13 +80,13 @@ namespace ByteFarm
         class AllPassFilterCascade
         {
         public:
-            AllPassFilterCascade(double *coefficients, const uint8_t numCoefficients)
+            AllPassFilterCascade(float *coefficients, const uint8_t numCoefficients)
             {
                 numfilters = numCoefficients;
                 allpassfilters = (AllPassFilter **)malloc(sizeof(AllPassFilter *) * numCoefficients);
                 for (uint8_t i = 0; i < numfilters; i++)
                 {
-                    double c = (coefficients)[i];
+                    float c = (coefficients)[i];
                     AllPassFilterParams *p = new AllPassFilterParams(c);
                     AllPassFilter *f = new AllPassFilter(p);
                     allpassfilters[i] = f;
@@ -146,15 +148,15 @@ namespace ByteFarm
         class CascadedAllPassFilterParams
         {
         public:
-            double *a_coefficients;
-            double *b_coefficients;
+            float *a_coefficients;
+            float *b_coefficients;
             uint8_t NumCoefficients;
 
             static CascadedAllPassFilterParams *HalfBandFilter(HalfBandFilterOrder order, HalfBandFilterAngle angle)
             {
 
-                double *a;
-                double *b;
+                float *a;
+                float *b;
                 uint8_t n;
 
                 switch (angle)
@@ -164,33 +166,33 @@ namespace ByteFarm
                     switch (order)
                     {
                     case TWELVEPOLE:
-                        a = (double *)C12S->a_coefficients.Ptr();
-                        b = (double *)C12S->b_coefficients.Ptr();
+                        a = (float *)C12S->a_coefficients.Ptr();
+                        b = (float *)C12S->b_coefficients.Ptr();
                         n = C12S->NumCoefficients;
                         break;
                     case TENPOLE:
-                        a = (double *)C10S->a_coefficients.Ptr();
-                        b = (double *)C10S->b_coefficients.Ptr();
+                        a = (float *)C10S->a_coefficients.Ptr();
+                        b = (float *)C10S->b_coefficients.Ptr();
                         n = C10S->NumCoefficients;
                         break;
                     case EIGHTPOLE:
-                        a = (double *)C8S->a_coefficients.Ptr();
-                        b = (double *)C8S->b_coefficients.Ptr();
+                        a = (float *)C8S->a_coefficients.Ptr();
+                        b = (float *)C8S->b_coefficients.Ptr();
                         n = C8S->NumCoefficients;
                         break;
                     case SIXPOLE:
-                        a = (double *)C6S->a_coefficients.Ptr();
-                        b = (double *)C6S->b_coefficients.Ptr();
+                        a = (float *)C6S->a_coefficients.Ptr();
+                        b = (float *)C6S->b_coefficients.Ptr();
                         n = C6S->NumCoefficients;
                         break;
                     case FOURPOLE:
-                        a = (double *)C4S->a_coefficients.Ptr();
-                        b = (double *)C4S->b_coefficients.Ptr();
+                        a = (float *)C4S->a_coefficients.Ptr();
+                        b = (float *)C4S->b_coefficients.Ptr();
                         n = C4S->NumCoefficients;
                         break;
                     case TWOPOLE:
-                        a = (double *)C2S->a_coefficients.Ptr();
-                        b = (double *)C2S->b_coefficients.Ptr();
+                        a = (float *)C2S->a_coefficients.Ptr();
+                        b = (float *)C2S->b_coefficients.Ptr();
                         n = C2S->NumCoefficients;
                         break;
                     default:
@@ -205,33 +207,33 @@ namespace ByteFarm
                     switch (order)
                     {
                     case TWELVEPOLE:
-                        a = (double *)C12G->a_coefficients.Ptr();
-                        b = (double *)C12G->b_coefficients.Ptr();
+                        a = (float *)C12G->a_coefficients.Ptr();
+                        b = (float *)C12G->b_coefficients.Ptr();
                         n = C12G->NumCoefficients;
                         break;
                     case TENPOLE:
-                        a = (double *)C10G->a_coefficients.Ptr();
-                        b = (double *)C10G->b_coefficients.Ptr();
+                        a = (float *)C10G->a_coefficients.Ptr();
+                        b = (float *)C10G->b_coefficients.Ptr();
                         n = C10G->NumCoefficients;
                         break;
                     case EIGHTPOLE:
-                        a = (double *)C8G->a_coefficients.Ptr();
-                        b = (double *)C8G->b_coefficients.Ptr();
+                        a = (float *)C8G->a_coefficients.Ptr();
+                        b = (float *)C8G->b_coefficients.Ptr();
                         n = C8G->NumCoefficients;
                         break;
                     case SIXPOLE:
-                        a = (double *)C6G->a_coefficients.Ptr();
-                        b = (double *)C6G->b_coefficients.Ptr();
+                        a = (float *)C6G->a_coefficients.Ptr();
+                        b = (float *)C6G->b_coefficients.Ptr();
                         n = C6G->NumCoefficients;
                         break;
                     case FOURPOLE:
-                        a = (double *)C4G->a_coefficients.Ptr();
-                        b = (double *)C4G->b_coefficients.Ptr();
+                        a = (float *)C4G->a_coefficients.Ptr();
+                        b = (float *)C4G->b_coefficients.Ptr();
                         n = C4G->NumCoefficients;
                         break;
                     case TWOPOLE:
-                        a = (double *)C2G->a_coefficients.Ptr();
-                        b = (double *)C2G->b_coefficients.Ptr();
+                        a = (float *)C2G->a_coefficients.Ptr();
+                        b = (float *)C2G->b_coefficients.Ptr();
                         n = C2G->NumCoefficients;
                         break;
                     default:

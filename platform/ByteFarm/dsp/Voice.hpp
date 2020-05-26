@@ -36,7 +36,7 @@ namespace ByteFarm
 
         public:
             VoiceParams Params;
-            virtual void Increment() = 0;
+            virtual void IncrementEnvelope(uint32_t frames) = 0;
             virtual void Reset() = 0;
             virtual float Generate() = 0;
             virtual void UpdateOscParams(VoiceParams params) = 0;

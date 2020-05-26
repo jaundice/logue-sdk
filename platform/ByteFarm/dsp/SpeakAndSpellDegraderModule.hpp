@@ -33,12 +33,12 @@ namespace ByteFarm
                 {
                 case 0:
                 {
-                    wf->Params->SetBits(1.f + (val * 31.f));
+                    wf->Params->SetBits(16.f - (val * 15.f));
                     break;
                 }
                 case 1:
                 {
-                    wf->GetSandSParams()->Downsample = 1.f + (val * 31.f);
+                    wf->GetSandSParams()->Downsample = 1.f + (val * 63.f);
                     break;
                 }
                 }

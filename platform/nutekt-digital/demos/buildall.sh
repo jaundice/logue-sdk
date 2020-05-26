@@ -22,3 +22,15 @@ cd ../
 cd WaveTableOne
 make clean
 make
+cd ../
+cd SuperSaw16
+make clean
+make
+cd ../
+cd SuperTri16
+make clean
+make
+cd ../
+cd SuperSquare16
+make clean
+make

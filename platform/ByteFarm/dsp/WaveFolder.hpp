@@ -20,7 +20,8 @@ namespace ByteFarm
 
             inline float Delta(float delta)
             {
-                return fasterpowf(fabs(delta), Params->Aggression);
+                return fabs(delta);
+                //return fasterpowf(fabs(delta), Params->Aggression);
             }
 
             inline float Folder(float s)
@@ -33,34 +34,12 @@ namespace ByteFarm
                 if (s > Params->MinLimit && s < Params->MaxLimit)
                     return s;
 
-                if (s < Params->MinLimit || s > Params->MaxLimit)
-                {
+                uint8_t i=0;
+                do{
                     s = Folder(s);
-                }
-                if (s < Params->MinLimit || s > Params->MaxLimit)
-                {
-                    s = Folder(s);
-                }
-                if (s < Params->MinLimit || s > Params->MaxLimit)
-                {
-                    s = Folder(s);
-                }
-                if (s < Params->MinLimit || s > Params->MaxLimit)
-                {
-                    s = Folder(s);
-                }
-                if (s < Params->MinLimit || s > Params->MaxLimit)
-                {
-                    s = Folder(s);
-                }
-                if (s < Params->MinLimit || s > Params->MaxLimit)
-                {
-                    s = Folder(s);
-                }
-                if (s < Params->MinLimit || s > Params->MaxLimit)
-                {
-                    s = fx_softclipf(0, s); //fmax(MinLimit, fmin(MaxLimit, s)); //we are bouncing high and low too much so we just clip
-                }
+                }while(i++ < 8 &&  Params->MinLimit || s > Params->MaxLimit);
+
+                s = fx_softclipf(0.25f, s);
 
                 return s;
             }

@@ -21,7 +21,7 @@ namespace ByteFarm
                 Voices = voices;
             }
 
-            virtual VoiceParams ConvertOscParams(const user_osc_param_t *const params)
+            inline virtual VoiceParams ConvertOscParams(const user_osc_param_t *const params)
             {
                 VoiceParams vp;
                 vp.NoteNumber = params->pitch >> 8;
@@ -32,7 +32,7 @@ namespace ByteFarm
                 return vp;
             };
 
-            virtual void Reset()
+            inline virtual void Reset()
             {
                 for (uint8_t i = 0; i < NumVoices; i++)
                 {
@@ -40,15 +40,15 @@ namespace ByteFarm
                 }
             }
 
-            virtual void Increment()
+            inline virtual void Increment(uint32_t frames)
             {
                 for (uint8_t i = 0; i < NumVoices; i++)
                 {
-                    Voices->Get(i)->Increment();
+                    Voices->Get(i)->IncrementEnvelope(frames);
                 }
             }
 
-            virtual void NoteOn()
+            inline virtual void NoteOn()
             {
                 for (uint8_t i = 0; i < NumVoices; i++)
                 {
@@ -56,7 +56,7 @@ namespace ByteFarm
                 }
             }
 
-            virtual void NoteOff()
+            inline virtual void NoteOff()
             {
                 for (uint8_t i = 0; i < NumVoices; i++)
                 {
@@ -66,7 +66,7 @@ namespace ByteFarm
 
             virtual void UpdateOscParams(VoiceParams params) = 0;
 
-            void Generate(int32_t *yn,
+            inline void Generate(int32_t *yn,
                           const uint32_t frames)
             {
                 q31_t *__restrict y = (q31_t *)yn;
@@ -74,7 +74,6 @@ namespace ByteFarm
 
                 for (; y != y_e;)
                 {
-                    Increment();
                     float sig = 0.f;
                     for (uint8_t i = 0; i < NumVoices; i++)
                     {
@@ -82,6 +81,8 @@ namespace ByteFarm
                     }
                     *(y++) = f32_to_q31(sig);
                 }
+                
+                Increment(frames);
             }
 
             virtual void UpdateParams(uint16_t index, uint16_t value) = 0;

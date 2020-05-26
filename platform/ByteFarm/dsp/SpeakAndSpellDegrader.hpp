@@ -11,7 +11,7 @@ namespace ByteFarm
 		class SpeakAndSpellDegraderParams : public BitReducerParams
 		{
 		public:
-			volatile uint8_t Downsample = 1;
+			volatile uint8_t Downsample = 16;
 
 			SpeakAndSpellDegraderParams() : BitReducerParams()
 			{

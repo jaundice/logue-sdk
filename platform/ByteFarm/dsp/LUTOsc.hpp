@@ -12,11 +12,13 @@ namespace ByteFarm
             float freq;
             float stride;
             float index = 0.f;
+            float startPhase = 0.f;
 
         public:
-            LUTOsc(float * lut)
+            LUTOsc(float * lut, float startPhase = 0.f)
             {
                 _table = lut;
+                this->startPhase = fabs(startPhase);
                 SetFreq(440.f);
                 Reset();
             }
@@ -29,7 +31,7 @@ namespace ByteFarm
 
             void Reset()
             {
-                index = 0.f;
+                index = startPhase * (float)LUTLength;
             }
 
             float NextSample()

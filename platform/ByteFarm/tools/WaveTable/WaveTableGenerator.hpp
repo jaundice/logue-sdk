@@ -10,6 +10,13 @@ namespace ByteFarm
 
         typedef float (*Functor)(float angle);
 
+        enum CommonWaveShapes{
+            Sine =1,
+            Tri = Sine <<1,
+            Saw = Tri << 1,
+            Sqr = Saw << 1
+        };
+
         class CommonWaveTableFunctors
         {
         public:

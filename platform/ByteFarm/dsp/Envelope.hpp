@@ -33,7 +33,8 @@ namespace ByteFarm
         enum EnvelopeSlope
         {
             Linear = 1,
-            Exponential = Linear << 1
+            Exponential = Linear << 1,
+            Log = Exponential << 1
         };
 
         template <size_t SampleRate>
@@ -70,7 +71,8 @@ namespace ByteFarm
                     CurrentStage = Off;
                     return;
                 }
-                case Delay:{
+                case Delay:
+                {
                     CurrentStage = Attack;
                     return;
                 }
@@ -106,7 +108,18 @@ namespace ByteFarm
                 }
                 case Sustain:
                 {
-                    CurrentStage = Release;
+                    if (HasFlag(Stages, Release))
+                    {
+                        CurrentStage = Release;
+                    }
+                    else if (HasFlag(Stages, Loop))
+                    {
+                        CurrentStage = HasFlag(Stages, Delay) ? Delay : Attack;
+                    }
+                    else
+                    {
+                        CurrentStage = Off;
+                    }
                     return;
                 }
                 }
@@ -134,7 +147,7 @@ namespace ByteFarm
                 }
                 case Decay:
                 {
-                    float lowLevel = HasFlag(Stages, Sustain) ? SustainLevel : 0.f;
+                    float lowLevel = HasFlag(Stages, Sustain) || HasFlag(Stages, Release) ? SustainLevel : 0.f;
                     Output = 1.f - ((1.f - lowLevel) * (float)ElapsedFrames / (float)DecayFrames);
                     return;
                 }
@@ -148,10 +161,6 @@ namespace ByteFarm
                     Output = SustainLevel - ((SustainLevel) * (float)ElapsedFrames / (float)ReleaseFrames);
                     return;
                 }
-                default:
-                {
-                    Output = 0.5f;
-                }
                 }
             }
 
@@ -162,8 +171,10 @@ namespace ByteFarm
                 return Output;
             }
 
-            void Increment()
+            void Increment(uint32_t numFrames = 1)
             {
+
+
                 switch (CurrentStage)
                 {
                 case Delay:
@@ -222,8 +233,8 @@ namespace ByteFarm
                 }
                 }
 
+                ElapsedFrames+=numFrames;
                 Calculate();
-                ElapsedFrames++;
             }
 
             void UpdateEnvelopeStage(EnvelopeStage stage, float milliseconds)
@@ -258,7 +269,13 @@ namespace ByteFarm
                 }
             }
 
-            Envelope(EnvelopeStage envelopeStages, float delayMs, float attackMs, float holdMs, float decayMs, float releaseMs, float sustainLevel)
+            Envelope(EnvelopeStage envelopeStages,
+                     float delayMs,
+                     float attackMs,
+                     float holdMs,
+                     float decayMs,
+                     float releaseMs,
+                     float sustainLevel)
             {
                 Stages = envelopeStages;
                 SustainLevel = sustainLevel;
@@ -279,14 +296,14 @@ namespace ByteFarm
             void NoteOn()
             {
                 NoteDown = true;
-                switch (this->CurrentStage)
-                {
-                case Off:
-                {
+                //switch (this->CurrentStage)
+                //{
+                //case Off:
+                //{
                     CurrentStage = HasFlag(Stages, Delay) ? Delay : Attack;
                     ElapsedFrames = 0;
-                }
-                }
+                //}
+                //}
             }
 
             void NoteOff()

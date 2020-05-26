@@ -41,22 +41,22 @@ namespace ByteFarm
                     i++;
                 }
             }
-            T Get(intType idx)
+            inline T Get(intType idx)
             {
                 return _array[idx % sz];
             }
 
-            void Set(intType idx, T value)
+            inline void Set(intType idx, T value)
             {
                 _array[idx % sz] = value;
             }
 
-            intType Size()
+            inline intType Size()
             {
                 return sz;
             }
 
-            const T *Ptr()
+            inline const T *Ptr()
             {
                 return _array;
             }

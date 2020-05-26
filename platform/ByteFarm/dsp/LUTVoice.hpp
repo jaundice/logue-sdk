@@ -9,68 +9,81 @@ namespace ByteFarm
 {
     namespace Dsp
     {
-        template <uint8_t NumOcillators, size_t LUTSize, size_t SampleRate>
+        template <uint8_t NumOscillators, uint8_t NumEnvelopes, size_t LUTSize, size_t SampleRate>
         class LUTVoice : public Voice
         {
-        public:
-            TypedArray<LUTOsc<LUTSize, SampleRate> *, NumOcillators, uint8_t> Oscillators;
-            TypedArray<Envelope<SampleRate> *, NumOcillators, uint8_t> Envelopes;
+        protected:
+            const float OneOverNumOscillators = 1.f / (float)NumOscillators;
 
-            virtual void Increment() override
+        public:
+            TypedArray<LUTOsc<LUTSize, SampleRate> *, NumOscillators, uint8_t> Oscillators;
+            TypedArray<Envelope<SampleRate> *, NumEnvelopes, uint8_t> Envelopes;
+            float Slop[NumEnvelopes]{0};
+
+            virtual void IncrementEnvelope(uint32_t frames) override
             {
-                for (uint8_t i = 0; i < NumOcillators; i++)
+                for (uint8_t i = 0; i < NumEnvelopes; i++)
                 {
-                    Envelopes.Get(i)->Increment();
+                    Envelopes.Get(i)->Increment(frames);
                 }
             };
 
             virtual void Reset() override
             {
-                for (uint8_t i = 0; i < NumOcillators; i++)
+                for (uint8_t i = 0; i < NumOscillators; i++)
                 {
                     Oscillators.Get(i)->Reset();
+                }
+                for (uint8_t i = 0; i < NumEnvelopes; i++)
+                {
                     Envelopes.Get(i)->Reset();
                 }
             };
-            virtual float Generate() override
+
+            inline virtual float OscillatorAmpModifier(uint8_t ocillatorIndex) 
+            {
+                return OneOverNumOscillators;
+            }
+
+            inline virtual float AmpEnvelopeValueForOscillator(uint8_t oscillatorNumber) 
+            {
+                return Envelopes.Get(oscillatorNumber % NumOscillators)->CurrentValue();
+            }
+
+            inline virtual float Generate() override
             {
                 float ret = 0.f;
-                for (uint8_t i = 0; i < NumOcillators; i++)
+                for (uint8_t i = 0; i < NumOscillators; i++)
                 {
-                    float scale = 1.f;
-                    if (i == 1)
-                    {
-                        scale = 0.25f + Params.ShapeLfo * 0.5f;
-                    }
-                    else if (i == 2)
-                    {
-                        scale = 0.25f + (1.f - Params.ShapeLfo) * 0.5f;
-                    }
-
-                    ret += Oscillators.Get(i)->NextSample() * scale * Envelopes.Get(i)->CurrentValue();
+                    ret += Oscillators.Get(i)->NextSample() * OscillatorAmpModifier(i) * AmpEnvelopeValueForOscillator(i);
                 }
                 return ret;
             };
 
-            virtual void UpdateOscParams(VoiceParams params) override
+            inline virtual void UpdateOscParams(VoiceParams params) override
             {
                 Params = params;
-                Oscillators.Get(0)->SetFreq(NoteToHz(params.NoteNumber, params.Detune));
-                Oscillators.Get(1)->SetFreq(NoteToHz(params.NoteNumber, params.Detune + (0.7f * osc_white())));
-                Oscillators.Get(2)->SetFreq(NoteToHz(params.NoteNumber, params.Detune + (0.6f * osc_white())));
+                for (uint8_t i = 0; i < NumOscillators; i++)
+                {
+                    uint8_t octave = i % 3 *12u;
+                    float freq = NoteToHz(params.NoteNumber -octave, params.Detune);
+                    float lg = log2f(freq);
+                    lg = i%2 == 0 ? lg : -1.f * lg;
+                    Oscillators.Get(i)->SetFreq(freq + lg*osc_white());
+                }
             };
 
-            virtual void NoteOn() override
+            inline virtual void NoteOn() override
             {
-                for (uint8_t i = 0; i < NumOcillators; i++)
+                for (uint8_t i = 0; i < NumEnvelopes; i++)
                 {
                     Envelopes.Get(i)->NoteOn();
                 }
             };
-            virtual void NoteOff() override
+            inline virtual void NoteOff() override
             {
 
-                for (uint8_t i = 0; i < NumOcillators; i++)
+                for (uint8_t i = 0; i < NumEnvelopes; i++)
                 {
                     Envelopes.Get(i)->NoteOff();
                 }

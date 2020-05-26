@@ -11,6 +11,37 @@ namespace ByteFarm
     namespace Dsp
     {
 
+        template <uint8_t NumOscillators, uint8_t numEnvelopes, size_t LUTSize, size_t SampleRate>
+        class WaveTableOneLUTVoice : public LUTVoice<NumOscillators, numEnvelopes, LUTSize, SampleRate>
+        {
+        public:
+            inline virtual float OscillatorAmpModifier(uint8_t oscillatorIndex)
+            {
+                float scale = 0.5f;
+                if (oscillatorIndex == 1)
+                {
+                    scale = 0.25f + this->Params.ShapeLfo * 0.5f;
+                }
+                else if (oscillatorIndex == 2)
+                {
+                    scale = 0.25f + (1.f - this->Params.ShapeLfo) * 0.5f;
+                }
+
+                return scale;
+            }
+
+            inline virtual void UpdateOscParams(VoiceParams params) override
+            {
+                this->Params = params;
+                float freq = this->NoteToHz(params.NoteNumber, params.Detune);
+                float logFreq = log2f(freq);
+                
+                this->Oscillators.Get(0)->SetFreq(freq + logFreq * osc_white());
+                this->Oscillators.Get(1)->SetFreq(freq + logFreq * -1.f * osc_white());
+                this->Oscillators.Get(2)->SetFreq(freq + logFreq * osc_white());
+            };
+        };
+
         template <size_t LUTSize, size_t SampleRate>
         TypedArray<Voice *, 1, uint8_t> *GetVoices()
         {
@@ -26,12 +57,12 @@ namespace ByteFarm
             ByteFarm::Tools::WaveTableGenerator::Fill<LUTSize>(tri->Table, ByteFarm::Tools::CommonWaveTableFunctors::Tri<8>);
             //ByteFarm::Tools::WaveTableGenerator::Fill<LUTSize>(sin->Table, ByteFarm::Tools::CommonWaveTableFunctors::Sine);
 
-            LUTOsc<LUTSize, SampleRate> *sqrOsc = new LUTOsc<LUTSize, SampleRate>(sqr->Table);
-            LUTOsc<LUTSize, SampleRate> *sawOsc = new LUTOsc<LUTSize, SampleRate>(saw->Table);
-            LUTOsc<LUTSize, SampleRate> *triOsc = new LUTOsc<LUTSize, SampleRate>(tri->Table);
+            LUTOsc<LUTSize, SampleRate> *sqrOsc = new LUTOsc<LUTSize, SampleRate>(sqr->Table, osc_white());
+            LUTOsc<LUTSize, SampleRate> *sawOsc = new LUTOsc<LUTSize, SampleRate>(saw->Table, osc_white());
+            LUTOsc<LUTSize, SampleRate> *triOsc = new LUTOsc<LUTSize, SampleRate>(tri->Table, osc_white());
             //LUTOsc<LUTSize, SampleRate> *sinOsc = new LUTOsc<LUTSize, SampleRate>(sin->Table);
 
-            LUTVoice<3, LUTSize, SampleRate> *v = new LUTVoice<3, LUTSize, SampleRate>();
+            LUTVoice<3, 3, LUTSize, SampleRate> *v = new WaveTableOneLUTVoice<3, 3, LUTSize, SampleRate>();
 
             v->Oscillators.Set(0, sqrOsc);
             v->Oscillators.Set(1, sawOsc);
@@ -56,7 +87,7 @@ namespace ByteFarm
         {
 
         public:
-            WaveTableOneModule() : OscModule<1>(GetVoices<2048, 48000>())
+            WaveTableOneModule() : OscModule<1>(GetVoices<1024, 48000>())
             {
             }
 
