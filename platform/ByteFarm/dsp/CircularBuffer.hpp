@@ -12,6 +12,7 @@ namespace ByteFarm
 		{
 
 			volatile long _writeIndex = 0;
+			volatile long _blockSize = S;
 
 
 
@@ -29,14 +30,18 @@ namespace ByteFarm
 
 			void Write(T value, int32_t subOffset = 0)
 			{
-				this->Set((_writeIndex + subOffset) % S, value);
+				this->Set((_writeIndex + subOffset) % _blockSize, value);
 			}
 
 			void Increment()
 			{
 				//_writeIndex = (_writeIndex++ % S);
 				_writeIndex++;
-				_writeIndex%=S;
+				_writeIndex%=_blockSize;
+			}
+
+			void SetBlockSize(long blockSize){
+				_blockSize = blockSize;
 			}
 		};
 	} // namespace Dsp

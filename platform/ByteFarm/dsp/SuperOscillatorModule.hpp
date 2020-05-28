@@ -7,6 +7,7 @@
 #include "../tools/WaveTable/WaveTableGenerator.hpp"
 #include "Voice.hpp"
 #include "Envelope.hpp"
+#include "userosc.h"
 
 namespace ByteFarm
 {
@@ -81,8 +82,53 @@ namespace ByteFarm
             {
             }
 
-            virtual void UpdateParams(uint16_t index, uint16_t value) override{
+            virtual void UpdateParams(uint16_t index, uint16_t value) override
+            {
 
+                LUTVoice<16, 16, 1024, SAMPLERATE> *voice = (LUTVoice<16, 16, 1024, SAMPLERATE> *)this->Voices->Get(0);
+
+                switch (index)
+                {
+                case k_user_osc_param_id1:
+                {
+                    voice->SetSlop((float)value/100.f);
+                    break;
+                }
+                case k_user_osc_param_id2:
+                {
+                    for (uint8_t i = 0; i < voice->Envelopes.Size(); i++)
+                    {
+                        voice->Envelopes.Get(i)->SetSlop((float)value/100.f);
+                    }
+                    break;
+                }
+                case k_user_osc_param_id3:
+                {
+                    voice->AmpModulator = (float)value/100.f;
+                    break;
+                }
+                case k_user_osc_param_id4:
+                {
+                    voice->TuningModifier->SetSemis(value);
+                    break;
+                }
+                case k_user_osc_param_id5:
+                {
+                    break;
+                }
+                case k_user_osc_param_id6:
+                {
+                    break;
+                }
+                case k_user_osc_param_shape:
+                {
+                    break;
+                }
+                case k_user_osc_param_shiftshape:
+                {
+                    break;
+                }
+                }
             };
 
             virtual void UpdateOscParams(VoiceParams params) override

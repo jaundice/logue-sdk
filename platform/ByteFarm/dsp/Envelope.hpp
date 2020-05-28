@@ -46,8 +46,7 @@ namespace ByteFarm
             EnvelopeStage CurrentStage{EnvelopeStage::Off};
             float Output = 0.0f;
             float SustainLevel = 0.75f;
-
-            float Slop = 0.1;
+            float Slop = 0.1f;
 
             uint32_t ModelDelayFrames = 0;
             uint32_t ModelAttackFrames = 50;
@@ -176,6 +175,9 @@ namespace ByteFarm
             }
 
         public:
+
+            
+
             float CurrentValue()
             {
                 //return 1.f;
@@ -327,6 +329,10 @@ namespace ByteFarm
                 ElapsedFrames = 0;
                 //}
                 //}
+            }
+
+            void SetSlop(float slop){
+                Slop = slop;
             }
 
             void NoteOff()

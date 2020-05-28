@@ -82,6 +82,10 @@ namespace ByteFarm
 				return  (sample * (1.f - this->Params->Mix)) + (w * this->Params->Mix);
 			}
 
+			void SetBufferBlockSize(uint32_t blockSize){
+				this->_buffer.SetBlockSize(blockSize);
+			}
+
 			~DelayBase()
 			{
 				//delete _buffer;

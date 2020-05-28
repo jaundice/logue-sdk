@@ -10,12 +10,12 @@
         "name" : "Super Tri 16",
         "num_param" : 6,
         "params" : [
-            ["Wave A",      0,  45,  ""],
-            ["Wave B",      0,  43,  ""],
-            ["Sub Wave",    0,  15,  ""],
-            ["Sub Mix",     0, 100, "%"],
-            ["Ring Mix",    0, 100, "%"],
-            ["Bit Crush",   0, 100, "%"]
+            ["Tuning Slop",   0,  100,  "%"],
+            ["Envelope Slop", 0,  100,  "%"],
+            ["Fixed Amp Modulation", 0,  100,  "%"],
+            ["Tuning",     -36, 36, ""],
+            ["TODO",    0, 100, "%"],
+            ["TODO",   0, 100, "%"]
           ]
     }
 }

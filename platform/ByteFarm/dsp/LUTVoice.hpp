@@ -14,64 +14,81 @@ namespace ByteFarm
         class OscillatorTuningModifier
         {
         public:
-            virtual uint8_t GetOscillatorNote(uint8_t oscillatorIndex, int8_t note) = 0;
+            virtual int16_t GetOscillatorNote(uint8_t oscillatorIndex, int16_t note) = 0;
+            virtual void SetSemis(int16_t semis) = 0;
         };
 
         template <uint8_t NumOscillators>
         class UnisonTuningModifier : public OscillatorTuningModifier<NumOscillators>
         {
 
-            int8_t SemiTones;
+            int16_t SemiTones;
 
         public:
-            UnisonTuningModifier(int8_t semiTones)
+            UnisonTuningModifier(int16_t semiTones)
             {
                 SemiTones = semiTones;
             }
 
-            uint8_t GetOscillatorNote(uint8_t oscillatorIndex, int8_t note) override
+            void SetSemis(int16_t semis) override
+            {
+                SemiTones = semis;
+            }
+
+            int16_t GetOscillatorNote(uint8_t oscillatorIndex, int16_t note) override
             {
 
                 note += SemiTones;
 
                 if (note < 0)
                 {
-                    for (; note < 0;)
+                    do
+                    {
                         note += 12;
+                    } while (note < 0);
                 }
 
-                return (uint8_t)note;
+                return (int16_t)note;
             }
         };
 
         template <uint8_t NumOscillators, uint8_t NumOctaves>
         class OctavesTuningModifier : public OscillatorTuningModifier<NumOscillators>
         {
-            int8_t Modifier[NumOscillators];
-            uint8_t SemiTones;
+            int16_t Modifier[NumOscillators];
+            int16_t SemiTones;
 
         public:
-            OctavesTuningModifier(int8_t semiTones)
+            void SetSemis(int16_t semis) override
+            {
+                SemiTones = semis;
+            }
+
+            OctavesTuningModifier(int16_t semiTones)
             {
                 SemiTones = semiTones;
 
                 for (uint8_t i = 0; i < NumOscillators; i++)
                 {
-                    Modifier[i] = (i % NumOctaves) * 12 * -1 + SemiTones;
+                    Modifier[i] = (i % NumOctaves) * -12;
                 }
             }
 
-            uint8_t GetOscillatorNote(uint8_t oscillatorIndex, int8_t note) override
+            int16_t GetOscillatorNote(uint8_t oscillatorIndex, int16_t note) override
             {
                 note += Modifier[oscillatorIndex];
+                note += SemiTones;
 
                 if (note < 0)
                 {
-                    for (; note < 0;)
+
+                    do
+                    {
                         note += 12;
+                    } while (note < 0);
                 }
 
-                return (uint8_t)note;
+                return (int16_t)note;
             }
         };
 
@@ -79,7 +96,7 @@ namespace ByteFarm
         class OscillatorAmplitudeCalulator
         {
         public:
-            virtual float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 1.f) = 0;
+            virtual float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 0.f) = 0;
             virtual float GetOverallAmplitude() = 0;
         };
 
@@ -88,7 +105,8 @@ namespace ByteFarm
         {
             float Sin[100];
             float Offset = 100.f / NumOscillators;
-            public:
+
+        public:
             PhasedAmplitudeCalculator()
             {
                 float wt = 2 * PI / 100;
@@ -98,12 +116,13 @@ namespace ByteFarm
                 }
             }
 
-            float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 1.f) override
+            float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 0.f) override
             {
-                return Sin[((int16_t)(modulator * 100 + oscillatorIndex * Offset)) % 100] * 0.5f + 0.5f;
+                return Sin[((int16_t)(modulator * 100.f) + (int16_t)((float)oscillatorIndex * Offset)) % 100] * 0.5f + 0.5f;
             }
 
-            float GetOverallAmplitude() override{
+            float GetOverallAmplitude() override
+            {
                 return 1.f;
             }
         };
@@ -114,7 +133,7 @@ namespace ByteFarm
             float OverallAmp = 1.f / (float)NumOscillators;
 
         public:
-            float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 1.f) override
+            float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 0.f) override
             {
                 return 1.f;
             }
@@ -131,18 +150,26 @@ namespace ByteFarm
         protected:
             const float OneOverNumOscillators = 1.f / (float)NumOscillators;
             float Slop = 0.f;
-            OscillatorAmplitudeCalulator<NumOscillators> *AmplitudeCalculator;
-            OscillatorTuningModifier<NumOscillators> *TuningModifier;
 
         public:
             TypedArray<LUTOsc<LUTSize, SampleRate> *, NumOscillators, uint8_t> Oscillators;
             TypedArray<Envelope<SampleRate> *, NumEnvelopes, uint8_t> Envelopes;
+
+            OscillatorAmplitudeCalulator<NumOscillators> *AmplitudeCalculator;
+            OscillatorTuningModifier<NumOscillators> *TuningModifier;
+
+            float AmpModulator = 0.5f;
 
             LUTVoice(float slop, OscillatorAmplitudeCalulator<NumOscillators> *ampCalculator, OscillatorTuningModifier<NumOscillators> *tuningModifier)
             {
                 Slop = slop;
                 AmplitudeCalculator = ampCalculator;
                 TuningModifier = tuningModifier;
+            }
+
+            void SetSlop(float slop)
+            {
+                Slop = slop;
             }
 
             virtual void IncrementEnvelope(uint32_t frames) override
@@ -175,7 +202,10 @@ namespace ByteFarm
                 float ret = 0.f;
                 for (uint8_t i = 0; i < NumOscillators; i++)
                 {
-                    ret += Oscillators.Get(i)->NextSample() * AmplitudeCalculator->GetOscillatorAmplitude(i, Params.ShapeLfo) * AmpEnvelopeValueForOscillator(i);
+                    float ampMod = AmpModulator + Params.ShapeLfo;
+                    if (ampMod < 0)
+                        ampMod += 1.f;
+                    ret += Oscillators.Get(i)->NextSample() * AmplitudeCalculator->GetOscillatorAmplitude(i, ampMod) * AmpEnvelopeValueForOscillator(i);
                 }
                 return ret * AmplitudeCalculator->GetOverallAmplitude();
             };
@@ -188,8 +218,8 @@ namespace ByteFarm
                     //uint8_t octave = i % 3 * 12u;
                     float freq = NoteToHz(TuningModifier->GetOscillatorNote(i, params.NoteNumber), params.Detune);
                     float lg = log2f(freq);
-                    lg = i % 2 == 0 ? lg : -1.f * lg;
-                    Oscillators.Get(i)->SetFreq(freq + lg * osc_white() * Slop);
+
+                    Oscillators.Get(i)->SetFreq(freq + (lg * osc_white() * this->Slop));
                 }
             };
 

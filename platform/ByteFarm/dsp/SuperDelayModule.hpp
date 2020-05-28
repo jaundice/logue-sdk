@@ -66,13 +66,13 @@ namespace ByteFarm
                 {
                 case k_user_delfx_param_time:
                 {
-                    float bpm = fx_get_bpmf();
-                    float msPer32 = 1000.f / (32.f * bpm);
 
                     float totalms = ((float)BufferSize / (float)SampleRate) * 1000.f;
-                    uint32_t num32 = (uint32_t)(totalms / msPer32);
+                    float bpm = fx_get_bpmf();
+                    float msPer64 = 1000.f / (64.f * bpm);
+                    uint32_t num64 = (uint32_t)(totalms / msPer64);
+                    dly->Params->TimeMs = msPer64 * (float)(uint32_t)(val * num64);
 
-                    dly->Params->TimeMs = msPer32 * (float)(uint32_t)(val * val * num32);
                     break;
                 }
                 case k_user_delfx_param_shift_depth:
@@ -86,6 +86,15 @@ namespace ByteFarm
                     break;
                 }
                 }
+
+                float totalms = ((float)BufferSize / (float)SampleRate) * 1000.f;
+                float bpm = fx_get_bpmf();
+                float msPer64 = 1000.f / (64.f * bpm);
+                uint32_t num64 = (uint32_t)(totalms / msPer64);
+                uint32_t framesPer64 = msPer64 * SampleRate;
+
+                uint32_t num32 = (uint32_t)(totalms / msPer64);
+                dly->SetBufferBlockSize(framesPer64 * num64);
             }
         };
 
