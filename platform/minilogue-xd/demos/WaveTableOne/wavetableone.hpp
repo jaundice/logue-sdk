@@ -1,3 +1,4 @@
+#pragma once
 /*
     BSD 3-Clause License
 
@@ -32,30 +33,11 @@
 //*/
 
 /*
- * File: waves.cpp
+ *  File: waves.hpp
  *
- * Morphing wavetable oscillator
+ *  Morphing Wavetable Synthesizer
  *
  */
 
-#include "usermodfx.h"
-#include "speakandspelldegradermodule.hpp"
-#define SAMPLERATE 48000
-
-ByteFarm::Dsp::SpeakAndSpellDegraderModule<SAMPLERATE> _module;
-
-void MODFX_INIT(uint32_t platform, uint32_t api)
-{
-  (void)platform;
-  (void)api;
-}
-
-void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
-{
-  _module.Process(main_xn, main_yn, sub_xn, sub_yn, frames);
-}
-
-void MODFX_PARAM(uint8_t index, int32_t value)
-{
-  _module.UpdateParams(index, value);
-}
+#include "userosc.h"
+#include "biquad.hpp"

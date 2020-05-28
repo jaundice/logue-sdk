@@ -38,24 +38,40 @@
  *
  */
 
-#include "usermodfx.h"
-#include "speakandspelldegradermodule.hpp"
+#include "userosc.h"
+#include "SuperOscillatorModule.hpp"
 #define SAMPLERATE 48000
+ByteFarm::Dsp::SuperTriModule<SAMPLERATE> _module;
 
-ByteFarm::Dsp::SpeakAndSpellDegraderModule<SAMPLERATE> _module;
-
-void MODFX_INIT(uint32_t platform, uint32_t api)
+void OSC_INIT(uint32_t platform, uint32_t api)
 {
   (void)platform;
   (void)api;
 }
 
-void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
+void OSC_CYCLE(const user_osc_param_t *const params,
+               int32_t *yn,
+               const uint32_t frames)
 {
-  _module.Process(main_xn, main_yn, sub_xn, sub_yn, frames);
+    _module.UpdateOscParams(_module.ConvertOscParams(params));
+    _module.Generate(yn, frames);
 }
 
-void MODFX_PARAM(uint8_t index, int32_t value)
+void OSC_NOTEON(const user_osc_param_t *const params)
 {
-  _module.UpdateParams(index, value);
+  
+    _module.UpdateOscParams(_module.ConvertOscParams(params));
+    _module.NoteOn();
+}
+
+void OSC_NOTEOFF(const user_osc_param_t *const params)
+{
+  
+    _module.UpdateOscParams(_module.ConvertOscParams(params));
+    _module.NoteOff();
+}
+
+void OSC_PARAM(uint16_t index, uint16_t value)
+{
+    _module.UpdateParams(index, value);
 }
