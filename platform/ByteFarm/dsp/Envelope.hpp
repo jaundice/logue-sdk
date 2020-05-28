@@ -46,6 +46,16 @@ namespace ByteFarm
             EnvelopeStage CurrentStage{EnvelopeStage::Off};
             float Output = 0.0f;
             float SustainLevel = 0.75f;
+
+            float Slop = 0.1;
+
+            uint32_t ModelDelayFrames = 0;
+            uint32_t ModelAttackFrames = 50;
+            uint32_t ModelHoldFrames = 1000;
+            uint32_t ModelDecayFrames = 200;
+            uint32_t ModelReleaseFrames = 3000;
+            uint32_t ModelElapsedFrames = 0;
+
             uint32_t DelayFrames = 0;
             uint32_t AttackFrames = 50;
             uint32_t HoldFrames = 1000;
@@ -62,6 +72,7 @@ namespace ByteFarm
                 case Off:
                 case Release:
                 {
+                    ApplySlop();
                     if (HasFlag(Stages, Loop))
                     {
                         CurrentStage = HasFlag(Stages, Delay) ? Delay : Attack;
@@ -174,7 +185,6 @@ namespace ByteFarm
             void Increment(uint32_t numFrames = 1)
             {
 
-
                 switch (CurrentStage)
                 {
                 case Delay:
@@ -233,7 +243,7 @@ namespace ByteFarm
                 }
                 }
 
-                ElapsedFrames+=numFrames;
+                ElapsedFrames += numFrames;
                 Calculate();
             }
 
@@ -243,27 +253,27 @@ namespace ByteFarm
                 {
                 case Delay:
                 {
-                    DelayFrames = milliseconds * FramesPerMs;
+                    ModelDelayFrames = milliseconds * FramesPerMs;
                     return;
                 }
                 case Attack:
                 {
-                    AttackFrames = milliseconds * FramesPerMs;
+                    ModelAttackFrames = milliseconds * FramesPerMs;
                     return;
                 }
                 case Hold:
                 {
-                    HoldFrames = milliseconds * FramesPerMs;
+                    ModelHoldFrames = milliseconds * FramesPerMs;
                     return;
                 }
                 case Decay:
                 {
-                    DecayFrames = milliseconds * FramesPerMs;
+                    ModelDecayFrames = milliseconds * FramesPerMs;
                     return;
                 }
                 case Release:
                 {
-                    ReleaseFrames = milliseconds * FramesPerMs;
+                    ModelReleaseFrames = milliseconds * FramesPerMs;
                     return;
                 }
                 }
@@ -275,15 +285,28 @@ namespace ByteFarm
                      float holdMs,
                      float decayMs,
                      float releaseMs,
-                     float sustainLevel)
+                     float sustainLevel,
+                     float slop)
             {
                 Stages = envelopeStages;
                 SustainLevel = sustainLevel;
+                Slop = slop;
                 UpdateEnvelopeStage(Delay, delayMs);
                 UpdateEnvelopeStage(Attack, attackMs);
                 UpdateEnvelopeStage(Hold, holdMs);
                 UpdateEnvelopeStage(Decay, decayMs);
                 UpdateEnvelopeStage(Release, releaseMs);
+
+                ApplySlop();
+            }
+
+            void ApplySlop()
+            {
+                DelayFrames = ModelDelayFrames + (uint32_t)(Slop * osc_white() * ModelDelayFrames);
+                AttackFrames = ModelAttackFrames + (uint32_t)(Slop * osc_white() * ModelAttackFrames);
+                HoldFrames = ModelHoldFrames + (uint32_t)(Slop * osc_white() * ModelHoldFrames);
+                DecayFrames = ModelDecayFrames + (uint32_t)(Slop * osc_white() * ModelDecayFrames);
+                ReleaseFrames = ModelReleaseFrames + (uint32_t)(Slop * osc_white() * ModelReleaseFrames);
             }
 
             void Reset()
@@ -300,8 +323,8 @@ namespace ByteFarm
                 //{
                 //case Off:
                 //{
-                    CurrentStage = HasFlag(Stages, Delay) ? Delay : Attack;
-                    ElapsedFrames = 0;
+                CurrentStage = HasFlag(Stages, Delay) ? Delay : Attack;
+                ElapsedFrames = 0;
                 //}
                 //}
             }

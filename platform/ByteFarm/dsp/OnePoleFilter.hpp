@@ -14,13 +14,14 @@ namespace ByteFarm
 			volatile float Cutoff;
 		};
 
-		class OnePoleLowPassFilter : public FxElement<OnePoleFilterParams>
+		template<size_t SAMPLERATE>
+		class OnePoleLowPassFilter : public FxElement<OnePoleFilterParams, SAMPLERATE>
 		{
 			LRSample32F _last{
 				0, 0};
 
 		public:
-			OnePoleLowPassFilter(OnePoleFilterParams *params) : FxElement<OnePoleFilterParams>(params)
+			OnePoleLowPassFilter(OnePoleFilterParams *params) : FxElement<OnePoleFilterParams, SAMPLERATE>(params)
 			{
 			}
 

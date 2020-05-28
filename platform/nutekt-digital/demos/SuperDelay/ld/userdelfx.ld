@@ -32,30 +32,20 @@
 //*/
 
 /*
- * File: waves.cpp
- *
- * Morphing wavetable oscillator
- *
+ *  File: userdelfx.ld 
+ * 
+ *  Linker Script for user delay effects
  */
 
-#include "usermodfx.h"
-#include "speakandspelldegradermodule.hpp"
-#define SAMPLERATE 48000
+/* Entry Point */
+ENTRY(_entry) 
 
-ByteFarm::Dsp::SpeakAndSpellDegraderModule<SAMPLERATE> _module;
-
-void MODFX_INIT(uint32_t platform, uint32_t api)
+/* Specify the memory areas */
+MEMORY
 {
-  (void)platform;
-  (void)api;
+  SRAM   (rx) : org = 0x20019000, len = 12K
+  SDRAM  (rw) : org = 0xC0420000, len = 2432K
 }
 
-void MODFX_PROCESS(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
-{
-  _module.Process(main_xn, main_yn, sub_xn, sub_yn, frames);
-}
-
-void MODFX_PARAM(uint8_t index, int32_t value)
-{
-  _module.UpdateParams(index, value);
-}
+/* Include Rules */
+INCLUDE rules.ld

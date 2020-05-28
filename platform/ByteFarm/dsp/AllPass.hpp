@@ -20,10 +20,11 @@ namespace ByteFarm
             }
         };
 
-        class AllPassFilter : public FxElement<AllPassFilterParams>
+        template <size_t SAMPLERATE>
+        class AllPassFilter : public FxElement<AllPassFilterParams, SAMPLERATE>
         {
         public:
-            AllPassFilter(AllPassFilterParams *params) : FxElement<AllPassFilterParams>(params)
+            AllPassFilter(AllPassFilterParams *params) : FxElement<AllPassFilterParams, SAMPLERATE>(params)
             {
                 Reset();
             };
@@ -46,8 +47,8 @@ namespace ByteFarm
 
                 //allpass filter 1
                 const LRSample32F output{
-                    x2.Left + (float)((input.Left - y2.Left) * Params->a), 
-                    x2.Right + (float)((input.Right - y2.Right) * Params->a)};
+                    x2.Left + (float)((input.Left - y2.Left) * this->Params->a),
+                    x2.Right + (float)((input.Right - y2.Right) * this->Params->a)};
 
                 y0 = output;
 
@@ -76,19 +77,19 @@ namespace ByteFarm
             LRSample32F y1;
             LRSample32F y2;
         };
-
+        template <size_t SAMPLERATE>
         class AllPassFilterCascade
         {
         public:
             AllPassFilterCascade(float *coefficients, const uint8_t numCoefficients)
             {
                 numfilters = numCoefficients;
-                allpassfilters = (AllPassFilter **)malloc(sizeof(AllPassFilter *) * numCoefficients);
+                allpassfilters = (AllPassFilter<SAMPLERATE> **)malloc(sizeof(AllPassFilter<SAMPLERATE> *) * numCoefficients);
                 for (uint8_t i = 0; i < numfilters; i++)
                 {
                     float c = (coefficients)[i];
                     AllPassFilterParams *p = new AllPassFilterParams(c);
-                    AllPassFilter *f = new AllPassFilter(p);
+                    AllPassFilter<SAMPLERATE> *f = new AllPassFilter<SAMPLERATE>(p);
                     allpassfilters[i] = f;
                 }
             };
@@ -125,7 +126,7 @@ namespace ByteFarm
             };
 
         private:
-            AllPassFilter **allpassfilters;
+            AllPassFilter<SAMPLERATE> **allpassfilters;
             uint8_t numfilters;
         };
 
@@ -252,14 +253,15 @@ namespace ByteFarm
             }; // namespace Dsp
         };
 
-        class HalfBandFilter : public FxElement<CascadedAllPassFilterParams>
+        template <size_t SAMPLERATE>
+        class HalfBandFilter : public FxElement<CascadedAllPassFilterParams, SAMPLERATE>
         {
         public:
-            HalfBandFilter(CascadedAllPassFilterParams *params) : FxElement<CascadedAllPassFilterParams>(params)
+            HalfBandFilter(CascadedAllPassFilterParams *params) : FxElement<CascadedAllPassFilterParams, SAMPLERATE>(params)
             {
 
-                filter_a = new AllPassFilterCascade(Params->a_coefficients, Params->NumCoefficients);
-                filter_b = new AllPassFilterCascade(Params->b_coefficients, Params->NumCoefficients);
+                filter_a = new AllPassFilterCascade<SAMPLERATE>(this->Params->a_coefficients, this->Params->NumCoefficients);
+                filter_b = new AllPassFilterCascade<SAMPLERATE>(this->Params->b_coefficients, this->Params->NumCoefficients);
                 oldout = LRSample32F{0.f, 0.f};
             };
             ~HalfBandFilter()
@@ -283,8 +285,8 @@ namespace ByteFarm
             }
 
         private:
-            AllPassFilterCascade *filter_a;
-            AllPassFilterCascade *filter_b;
+            AllPassFilterCascade<SAMPLERATE> *filter_a;
+            AllPassFilterCascade<SAMPLERATE> *filter_b;
             LRSample32F oldout;
         };
 

@@ -41,8 +41,8 @@
 //     30};
 
 // ByteFarm::Dsp::AlienWah<420> _alien(&_params);
-
-ByteFarm::Dsp::AlienWahModule _module;
+#define SAMPLERATE 48000
+ByteFarm::Dsp::AlienWahModule<SAMPLERATE> _module;
 
 void MODFX_INIT(uint32_t platform, uint32_t api)
 {

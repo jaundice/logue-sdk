@@ -27,12 +27,13 @@ namespace ByteFarm
 			}
 		};
 
-		class BitReducer : public FxElement<BitReducerParams>
+        template<size_t SAMPLERATE>
+		class BitReducer : public FxElement<BitReducerParams, SAMPLERATE >
 		{
 			//BitReducerParams* _params;
 
 		public:
-			BitReducer(BitReducerParams *params) : FxElement<BitReducerParams>(params)
+			BitReducer(BitReducerParams *params) : FxElement<BitReducerParams, SAMPLERATE>(params)
 			{
 				//_params = params;
 			}

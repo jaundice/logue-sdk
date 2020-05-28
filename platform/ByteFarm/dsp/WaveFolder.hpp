@@ -1,6 +1,5 @@
 #pragma once
 #include "FxElement.hpp"
-#include "usermodfx.h"
 #include "LRSample32F.hpp"
 namespace ByteFarm
 {
@@ -15,7 +14,8 @@ namespace ByteFarm
             float Gain = 1.f;
         };
 
-        class WaveFolder : public FxElement<WaveFolderParams>
+        template<size_t SAMPLERATE>
+        class WaveFolder : public FxElement<WaveFolderParams, SAMPLERATE>
         {
 
             inline float Delta(float delta)
@@ -26,18 +26,18 @@ namespace ByteFarm
 
             inline float Folder(float s)
             {
-                return s > Params->MaxLimit ? Params->MaxLimit - Delta(s - Params->MaxLimit) : Params->MinLimit + Delta(Params->MinLimit - s);
+                return s > this->Params->MaxLimit ? this->Params->MaxLimit - Delta(s - this->Params->MaxLimit) : this->Params->MinLimit + Delta(this->Params->MinLimit - s);
             }
 
             inline float Fold(float s)
             {
-                if (s > Params->MinLimit && s < Params->MaxLimit)
+                if (s > this->Params->MinLimit && s < this->Params->MaxLimit)
                     return s;
 
                 uint8_t i=0;
                 do{
                     s = Folder(s);
-                }while(i++ < 8 &&  Params->MinLimit || s > Params->MaxLimit);
+                }while(i++ < 8 &&  this->Params->MinLimit || s > this->Params->MaxLimit);
 
                 s = fx_softclipf(0.25f, s);
 
@@ -45,7 +45,7 @@ namespace ByteFarm
             }
 
         public:
-            WaveFolder(WaveFolderParams *params) : FxElement<WaveFolderParams>(params)
+            WaveFolder(WaveFolderParams *params) : FxElement<WaveFolderParams, SAMPLERATE>(params)
             {
             }
 

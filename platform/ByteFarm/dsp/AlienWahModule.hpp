@@ -12,23 +12,25 @@ namespace ByteFarm
     namespace Dsp
     {
 
-        class AlienWahModule : public FxModule<1>
+        template <size_t SAMPLERATE>
+        static TypedArray<FxElementBase *, 1, uint8_t> *GetModules()
         {
 
-            static TypedArray<FxElementBase *, 1, uint8_t> *GetModules()
-            {
+            AlienWahParams<WAHBUFFERSIZE, SAMPLERATE> *p = new AlienWahParams<WAHBUFFERSIZE, SAMPLERATE>(300.f, 1.2f, 20);
+            FxElementBase *aw = (FxElementBase *)new AlienWah<WAHBUFFERSIZE, SAMPLERATE>(p);
+            TypedArray<FxElementBase *, 1, uint8_t> *mods = new TypedArray<FxElementBase *, 1, uint8_t>();
+            mods->Set(0, aw);
 
-                AlienWahParams<WAHBUFFERSIZE> *p = new AlienWahParams<WAHBUFFERSIZE>(300.f, 1.2f, 20);
-                FxElementBase *aw = (FxElementBase *)new AlienWah<WAHBUFFERSIZE>(p);
-                TypedArray<FxElementBase *, 1, uint8_t> *mods = new TypedArray<FxElementBase *, 1, uint8_t>();
-                mods->Set(0, aw);
+            return mods;
+        };
 
-                return mods;
-            }
+        template <size_t SAMPLERATE>
+        class AlienWahModule : public FxModule<1, SAMPLERATE>
+        {
 
         public:
             AlienWahModule()
-                : FxModule<1>(GetModules())
+                : FxModule<1, SAMPLERATE>(GetModules<SAMPLERATE>())
             {
             }
 
@@ -36,7 +38,7 @@ namespace ByteFarm
             {
                 float val = fabs(q31_to_f32(value));
 
-                ByteFarm::Dsp::AlienWah<WAHBUFFERSIZE> *aw = static_cast<ByteFarm::Dsp::AlienWah<WAHBUFFERSIZE> *>(Elements->Get(0));
+                ByteFarm::Dsp::AlienWah<WAHBUFFERSIZE, SAMPLERATE> *aw = static_cast<ByteFarm::Dsp::AlienWah<WAHBUFFERSIZE, SAMPLERATE> *>(this->Elements->Get(0));
 
                 switch (paramIndex)
                 {

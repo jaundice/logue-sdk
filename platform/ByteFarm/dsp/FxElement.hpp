@@ -16,7 +16,7 @@ namespace ByteFarm
             virtual void Reset(){};
         };
 
-        template <class TParams>
+        template <class TParams, size_t SAMPLERATE>
         class FxElement : public FxElementBase
         {
         public:

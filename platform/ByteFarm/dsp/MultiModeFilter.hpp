@@ -59,11 +59,12 @@ namespace ByteFarm
 		private:
 			void CalculateFeedbackAmount() { FeedbackAmount = Resonance + Resonance / (1.0f - Cutoff); }
 		};
-
-		class MultiModeFilter : public FxElement<MultiModeFilterParams>
+		
+		template<size_t SAMPLERATE>
+		class MultiModeFilter : public FxElement<MultiModeFilterParams, SAMPLERATE>
 		{
 		public:
-			MultiModeFilter(MultiModeFilterParams *params) : FxElement<MultiModeFilterParams>(params)
+			MultiModeFilter(MultiModeFilterParams *params) : FxElement<MultiModeFilterParams, SAMPLERATE>(params)
 
 			{
 				buf0 = {0, 0};

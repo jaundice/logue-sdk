@@ -40,8 +40,8 @@
 
 #include "usermodfx.h"
 #include "PolyPhaseModule.hpp"
-
-__sdram ByteFarm::Dsp::PolyPhaseMultiModule _module;
+#define SAMPLERATE 48000
+ByteFarm::Dsp::PolyPhaseMultiModule<SAMPLERATE> _module;
 
 void MODFX_INIT(uint32_t platform, uint32_t api)
 {

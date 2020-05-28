@@ -1,7 +1,6 @@
 // modified from https://www.musicdsp.org/en/latest/Effects/70-alien-wah.html
 #pragma once
 #include <complex>
-#include "usermodfx.h"
 #include "LRSample32F.hpp"
 #include "float_math.h"
 #include "dsp/simplelfo.hpp"
@@ -12,7 +11,7 @@ namespace ByteFarm
 {
 	namespace Dsp
 	{
-		template <size_t WAHBUFFERSIZE>
+		template <size_t WAHBUFFERSIZE, size_t SAMPLERATE>
 		class AlienWahParams
 		{
 
@@ -21,18 +20,18 @@ namespace ByteFarm
 			volatile float fb;
 			volatile int32_t delay;
 
-			AlienWahParams(float f, float fb, int16_t d)
+			AlienWahParams(float frequency, float feedback, int16_t delayFrames)
 			{
-				lfo.setF0(f, 1.f / SAMPLERATE);
-				fb = 0.5f;
-				delay = fmin(d, WAHBUFFERSIZE / 4.f); //static_cast<int32_t>(d/ SAMPLERATE * SAMPLERATE);
+				lfo.setF0(frequency, 1.f / SAMPLERATE);
+				this->fb = feedback;
+				delay = fmin(delayFrames, WAHBUFFERSIZE / 4.f); //static_cast<int32_t>(d/ SAMPLERATE * SAMPLERATE);
 				if (delay < 1)
 					delay = 1;
 			}
 		};
 
-		template <size_t WAHBUFFERSIZE>
-		class AlienWah : public FxElement<AlienWahParams<WAHBUFFERSIZE>>
+		template <size_t WAHBUFFERSIZE, size_t SAMPLERATE>
+		class AlienWah : public FxElement<AlienWahParams<WAHBUFFERSIZE, SAMPLERATE>,SAMPLERATE>
 		{
 			std::complex<float> delaybuf[WAHBUFFERSIZE];
 			float sampleBufL[WAHBUFFERSIZE];
@@ -50,8 +49,8 @@ namespace ByteFarm
 			}
 
 		public:
-			AlienWah(AlienWahParams<WAHBUFFERSIZE> *params)
-				: FxElement<AlienWahParams<WAHBUFFERSIZE>>(params)
+			AlienWah(AlienWahParams<WAHBUFFERSIZE, SAMPLERATE> *params)
+				: FxElement<AlienWahParams<WAHBUFFERSIZE, SAMPLERATE>, SAMPLERATE>(params)
 			{
 				int16_t i;
 				for (i = 0; i < WAHBUFFERSIZE; i++)

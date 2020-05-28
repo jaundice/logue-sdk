@@ -1,5 +1,5 @@
 #pragma once
-#define SAMPLERATE 48000
+//#define SAMPLERATE 48000
 #include <stdlib.h>
 
 void *operator new(std::size_t n)

@@ -13,7 +13,7 @@ namespace ByteFarm
     namespace Dsp
     {
 
-        template <uint8_t numOscilators, uint8_t numEnvelopes, uint16_t LUTSize, size_t SAMPLERATE>
+        template <uint8_t NumOscillators, uint8_t NumEnvelopes, uint16_t LUTSize, size_t SAMPLERATE>
         TypedArray<Voice *, 1, uint8_t> *GetVoices(ByteFarm::Tools::CommonWaveShapes waveType)
         {
             TypedArray<Voice *, 1, uint8_t> *voices = new TypedArray<Voice *, 1, uint8_t>();
@@ -41,24 +41,29 @@ namespace ByteFarm
 
             ByteFarm::Tools::WaveTableGenerator::Fill<LUTSize>(table->Table, functor);
 
-            LUTVoice<numOscilators, numEnvelopes, LUTSize, SAMPLERATE> *v = new LUTVoice<numOscilators, numEnvelopes, LUTSize, SAMPLERATE>();
+            OscillatorAmplitudeCalulator<NumOscillators> *oscAmp = new EqualAmplitudeCalculator<NumOscillators>();
 
-            for (uint8_t i = 0; i < numOscilators; i++)
+            OscillatorTuningModifier<NumOscillators> *oscTune = new OctavesTuningModifier<NumOscillators, 3>(-12);
+
+            LUTVoice<NumOscillators, NumEnvelopes, LUTSize, SAMPLERATE> *v = new LUTVoice<NumOscillators, NumEnvelopes, LUTSize, SAMPLERATE>(0.01f, oscAmp, oscTune);
+
+            for (uint8_t i = 0; i < NumOscillators; i++)
             {
                 LUTOsc<LUTSize, SAMPLERATE> *osc = new LUTOsc<LUTSize, SAMPLERATE>(table->Table, osc_white());
                 v->Oscillators.Set(i, osc);
             }
 
-            for (uint8_t i = 0; i < numEnvelopes; i++)
+            for (uint8_t i = 0; i < NumEnvelopes; i++)
             {
                 //Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>((Attack | Decay | Sustain | Release), 200.f, 3000.f * i, 2000.f, 500.f * i, 5000.f * i, 0.75f);
                 Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(Delay | Attack | Hold | Decay | Sustain | Release, //envelope segments
-                                                                     1.f + 3.f * fabs(osc_white()),//delay
-                                                                     2.f + 50.f * fabs(osc_white()),//attack
-                                                                     200.f + 400.f * fabs(osc_white()),//hold
-                                                                     20.f + 100.f * fabs(osc_white()),//decay
-                                                                     4000.f + 1000.f * fabs(osc_white()),//release
-                                                                     0.5f + 0.5f * fabs(osc_white()));//sustain level
+                                                                     1.f + 3.f * fabs(osc_white()),                     //delay
+                                                                     2.f + 50.f * fabs(osc_white()),                    //attack
+                                                                     200.f + 400.f * fabs(osc_white()),                 //hold
+                                                                     20.f + 100.f * fabs(osc_white()),                  //decay
+                                                                     4000.f + 1000.f * fabs(osc_white()),               //release
+                                                                     0.5f + 0.5f * fabs(osc_white()),                   //sustain level
+                                                                     0.05f);                                            //slop
 
                 v->Envelopes.Set(i, env);
             }
@@ -67,11 +72,12 @@ namespace ByteFarm
             return voices;
         };
 
-        class SuperOscModule : public OscModule<1>
+        template <size_t SAMPLERATE>
+        class SuperOscModule : public OscModule<1, SAMPLERATE>
         {
 
         public:
-            SuperOscModule(ByteFarm::Tools::CommonWaveShapes waveType) : OscModule<1>(GetVoices<16, 16, 1024, 48000>(waveType))
+            SuperOscModule(ByteFarm::Tools::CommonWaveShapes waveType) : OscModule<1, SAMPLERATE>(GetVoices<16, 16, 1024, SAMPLERATE>(waveType))
             {
             }
 
@@ -81,36 +87,38 @@ namespace ByteFarm
 
             virtual void UpdateOscParams(VoiceParams params) override
             {
-                for (uint8_t i = 0; i < Voices->Size(); i++)
+                for (uint8_t i = 0; i < this->Voices->Size(); i++)
                 {
-                    Voices->Get(i)->UpdateOscParams(params);
+                    this->Voices->Get(i)->UpdateOscParams(params);
                 }
             };
         };
-
-        class SuperSawModule : public SuperOscModule
+        template <size_t SAMPLERATE>
+        class SuperSawModule : public SuperOscModule<SAMPLERATE>
         {
 
         public:
-            SuperSawModule() : SuperOscModule(ByteFarm::Tools::CommonWaveShapes::Saw)
+            SuperSawModule() : SuperOscModule<SAMPLERATE>(ByteFarm::Tools::CommonWaveShapes::Saw)
             {
             }
         };
 
-        class SuperTriModule : public SuperOscModule
+        template <size_t SAMPLERATE>
+        class SuperTriModule : public SuperOscModule<SAMPLERATE>
         {
 
         public:
-            SuperTriModule() : SuperOscModule(ByteFarm::Tools::CommonWaveShapes::Tri)
+            SuperTriModule() : SuperOscModule<SAMPLERATE>(ByteFarm::Tools::CommonWaveShapes::Tri)
             {
             }
         };
 
-        class SuperSquareModule : public SuperOscModule
+        template <size_t SAMPLERATE>
+        class SuperSquareModule : public SuperOscModule<SAMPLERATE>
         {
 
         public:
-            SuperSquareModule() : SuperOscModule(ByteFarm::Tools::CommonWaveShapes::Sqr)
+            SuperSquareModule() : SuperOscModule<SAMPLERATE>(ByteFarm::Tools::CommonWaveShapes::Sqr)
             {
             }
         };

@@ -3,6 +3,8 @@
 #include "CircularBuffer.hpp"
 #include "FxElement.hpp"
 #include "TypedArray.hpp"
+#include <inttypes.h>
+#include "LRSample32F.hpp"
 
 namespace ByteFarm
 {
@@ -12,24 +14,31 @@ namespace ByteFarm
 		class DelayParams
 		{
 		public:
-			volatile float Mix;
-			volatile float Feedback;
-			volatile long Time;
+			volatile float Mix = 0.5f;
+			volatile float Feedback = 0.15f;
+			volatile float TimeMs = 2500;
+			DelayParams(float mix, float feedback, float timeMs)
+			{
+				Mix = mix;
+				Feedback = feedback;
+				TimeMs = timeMs;
+			}
 		};
 
-		template <size_t BufferSize>
-		class DelayBase : public FxElement<DelayParams>
+		template <size_t BufferSize, uint16_t SampleRate, uint8_t NumDelayProcessors, uint8_t NumFeedbackProcessors>
+		class DelayBase : public FxElement<DelayParams, SampleRate>
 		{
-			CircularBuffer<LRSample32F, BufferSize> _buffer;
-			TypedArray<IProcessor *, BufferSize> _delayProcessors;
-			TypedArray<IProcessor *, BufferSize> _feedbackProcessors;
-			//DelayParams* _params;
 
-			DelayBase(DelayParams *params, TypedArray<IProcessor *> delayProcessors,
-					  TypedArray<IProcessor *> feedbackProcessors) : FxElement<DelayParams>(params)
+			CircularBuffer<LRSample32F, BufferSize, uint32_t> _buffer;
+			TypedArray<FxElementBase *, NumDelayProcessors, uint8_t> *_delayProcessors;
+			TypedArray<FxElementBase *, NumFeedbackProcessors, uint8_t> *_feedbackProcessors;
+			uint16_t FramesPerMs = SampleRate / 1000;
+
+		public:
+			DelayBase(DelayParams *params, TypedArray<FxElementBase *, NumDelayProcessors, uint8_t> *delayProcessors,
+					  TypedArray<FxElementBase *, NumFeedbackProcessors, uint8_t> *feedbackProcessors) : FxElement<DelayParams, SampleRate>(params)
 			{
-				//_params = params;
-				_buffer = new CircularBuffer<LRSample32F, BufferSize>();
+				//_buffer = new CircularBuffer<LRSample32F, BufferSize, uint32_t>();
 				_delayProcessors = delayProcessors;
 				_feedbackProcessors = feedbackProcessors;
 			}
@@ -37,13 +46,13 @@ namespace ByteFarm
 			void Increment() override
 			{
 				_buffer.Increment();
-				for (int i = 0; i < _delayProcessors.size(); i++)
+				for (int i = 0; i < _delayProcessors->Size(); i++)
 				{
-					_delayProcessors[i]->Increment();
+					_delayProcessors->Get(i)->Increment();
 				}
-				for (int j = 0; j < _feedbackProcessors.size(); j++)
+				for (int j = 0; j < _feedbackProcessors->Size(); j++)
 				{
-					_feedbackProcessors[j]->Increment();
+					_feedbackProcessors->Get(j)->Increment();
 				}
 			}
 
@@ -51,28 +60,31 @@ namespace ByteFarm
 			{
 				LRSample32F s = sample.Clone();
 
-				for (int i = 0; i < _delayProcessors.size(); i++)
+				for (int i = 0; i < _delayProcessors->Size(); i++)
 				{
-					s = _delayProcessors[i]->Process(s);
+					s = _delayProcessors->Get(i)->Process(s);
 				}
 
-				LRSample32F echo = _buffer.Read(this->Params->Time);
-				for (int j = 0; j < _feedbackProcessors.size(); j++)
+				LRSample32F echo = _buffer.Read((int32_t)(this->Params->TimeMs * -FramesPerMs)) * (0.45f * this->Params->Feedback);
+				for (int j = 0; j < _feedbackProcessors->Size(); j++)
 				{
-					echo = _feedbackProcessors[j]->Process(echo);
+					echo = _feedbackProcessors->Get(j)->Process(echo);
 				}
+				
+				//LRSample32F w = s + echo;
+				LRSample32F w = s + (echo * this->Params->Mix);
 
-				echo = echo * this->Params->Feedback;
+				_buffer.Write(LRSample32F{
+					fx_softclipf(0.05f, w.Left),
+					fx_softclipf(0.05f, w.Right)
+				});
 
-				LRSample32F w = s + echo;
-				_buffer.Write(w);
-
-				return (sample * (1 - this->Params->Mix)) + (w * this->Params->Mix);
+				return  (sample * (1.f - this->Params->Mix)) + (w * this->Params->Mix);
 			}
 
 			~DelayBase()
 			{
-				delete _buffer;
+				//delete _buffer;
 				delete _delayProcessors;
 				delete _feedbackProcessors;
 			}

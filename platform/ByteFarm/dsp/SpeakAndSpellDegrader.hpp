@@ -17,8 +17,8 @@ namespace ByteFarm
 			{
 			}
 		};
-
-		class SpeakAndSpellDegrader : public BitReducer
+		template <size_t SAMPLERATE>
+		class SpeakAndSpellDegrader : public BitReducer<SAMPLERATE>
 		{
 		private:
 			volatile uint8_t step = 0;
@@ -26,7 +26,7 @@ namespace ByteFarm
 			LRSample32F _sample{0, 0};
 
 		public:
-			SpeakAndSpellDegrader(SpeakAndSpellDegraderParams *params) : BitReducer(static_cast<BitReducerParams *>(params))
+			SpeakAndSpellDegrader(SpeakAndSpellDegraderParams *params) : BitReducer<SAMPLERATE>(static_cast<BitReducerParams *>(params))
 			{
 			}
 
@@ -40,7 +40,7 @@ namespace ByteFarm
 				if (step > 0)
 					return _sample;
 
-				_sample = BitReducer::Process(sample);
+				_sample = BitReducer<SAMPLERATE>::Process(sample);
 
 				return _sample;
 			}

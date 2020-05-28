@@ -7,7 +7,7 @@ namespace ByteFarm
     namespace Dsp
     {
 
-        template <size_t NumElements>
+        template <size_t NumElements, size_t SAMPLERATE>
         class FxModule
         {
         protected:
@@ -47,8 +47,34 @@ namespace ByteFarm
                         result = Elements->Get(idx)->Process(result);
                     }
 
-                    *(my++) = fx_softclipf(0.95f, /*  0.5f * s + 0.5f * */ result.Left);
-                    *(my++) = fx_softclipf(0.95f, /* 0.5f * s2 + 0.5f * */ result.Right);
+                    *(my++) = fx_softclipf(0.05f, result.Left);
+                    *(my++) = fx_softclipf(0.05f, result.Right);
+                }
+            }
+
+            virtual void ProcessInPlace(float *main_xn, uint32_t frames)
+            {
+                float *mx = main_xn;
+                float *mx_e = mx + 2 * frames;
+
+                // Loop through the samples
+                for (; mx != mx_e;)
+                {
+                    //float * pair = mx;
+
+                    float * s = (mx++);
+                    float * s2 = (mx++);
+
+                    ByteFarm::Dsp::LRSample32F result{*s, *s2};
+
+                    for (uint16_t idx = 0; idx < NumElements; idx++)
+                    {
+                        this->Elements->Get(idx)->Increment();
+                        result = this->Elements->Get(idx)->Process(result);
+                    }
+
+                    *(s) = fx_softclipf(0.05f, result.Left);
+                    *(s2) = fx_softclipf(0.05f, result.Right);
                 }
             }
 

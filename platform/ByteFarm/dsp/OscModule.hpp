@@ -9,7 +9,7 @@ namespace ByteFarm
     namespace Dsp
     {
 
-        template <uint8_t NumVoices>
+        template <uint8_t NumVoices, size_t SAMPLERATE>
         class OscModule
         {
             protected:

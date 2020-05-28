@@ -24,12 +24,13 @@ namespace ByteFarm
         class TypedArray
         {
         private:
-            T *_array;
+            //T *_array;
+            T  _array[sz];
 
         public:
             TypedArray()
             {
-                _array = (T *)(void(*))malloc(sizeof(T) * sz);
+                //_array = (T *)(void(*))malloc(sizeof(T) * sz);
             }
             TypedArray(std::initializer_list<T> input) : TypedArray()
             {
@@ -41,12 +42,12 @@ namespace ByteFarm
                     i++;
                 }
             }
-            inline T Get(intType idx)
+            inline T Get(int32_t idx)
             {
                 return _array[idx % sz];
             }
 
-            inline void Set(intType idx, T value)
+            inline void Set(int32_t idx, T value)
             {
                 _array[idx % sz] = value;
             }
@@ -68,7 +69,7 @@ namespace ByteFarm
                     Delete<T>(_array[i]);
                 }
 
-                delete _array;
+                //delete _array;
             }
         };
 

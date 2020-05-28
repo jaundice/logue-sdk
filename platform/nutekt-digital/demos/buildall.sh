@@ -34,3 +34,7 @@ cd ../
 cd SuperSquare16
 make clean
 make
+cd ../
+cd SuperDelay
+make clean
+make

@@ -40,8 +40,8 @@
 
 #include "usermodfx.h"
 #include "WaveFolderModule.hpp"
-
-ByteFarm::Dsp::WaveFolderModule _module;
+#define SAMPLERATE 48000
+ByteFarm::Dsp::WaveFolderModule<SAMPLERATE> _module;
 
 void MODFX_INIT(uint32_t platform, uint32_t api)
 {

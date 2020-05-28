@@ -41,8 +41,8 @@
 #include "userosc.h"
 #include "wavetableone.hpp"
 #include "WaveTableOneOscModule.hpp"
-
-ByteFarm::Dsp::WaveTableOneModule _module;
+#define SAMPLERATE 48000
+ByteFarm::Dsp::WaveTableOneModule<SAMPLERATE> _module;
 
 void OSC_INIT(uint32_t platform, uint32_t api)
 {

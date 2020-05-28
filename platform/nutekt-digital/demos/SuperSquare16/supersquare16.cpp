@@ -40,8 +40,8 @@
 
 #include "userosc.h"
 #include "SuperOscillatorModule.hpp"
-
-ByteFarm::Dsp::SuperSawModule _module;
+#define SAMPLERATE 48000
+ByteFarm::Dsp::SuperSawModule<SAMPLERATE> _module;
 
 void OSC_INIT(uint32_t platform, uint32_t api)
 {
