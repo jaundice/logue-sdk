@@ -32,30 +32,39 @@ namespace ByteFarm
             virtual void Reset() override
             {
 
-                x0 = LRSample32F{0.f, 0.f};
-                x1 = LRSample32F{0.f, 0.f};
-                x2 = LRSample32F{0.f, 0.f};
+                *x0 = LRSample32F{0.f, 0.f};
+                *x1 = LRSample32F{0.f, 0.f};
+                *x2 = LRSample32F{0.f, 0.f};
 
-                y0 = LRSample32F{0.f, 0.f};
-                y1 = LRSample32F{0.f, 0.f};
-                y2 = LRSample32F{0.f, 0.f};
+                *y0 = LRSample32F{0.f, 0.f};
+                *y1 = LRSample32F{0.f, 0.f};
+                *y2 = LRSample32F{0.f, 0.f};
+            }
+            ~AllPassFilter()
+            {
+                delete x0;
+                delete x1;
+                delete x2;
+                delete y0;
+                delete y1;
+                delete y2;
             }
 
-            virtual LRSample32F Process(LRSample32F input) override
+            inline virtual LRSample32F Process(LRSample32F input) override
             {
-                x0 = input;
+                *x0 = input;
 
                 //allpass filter 1
                 const LRSample32F output{
-                    x2.Left + (float)((input.Left - y2.Left) * this->Params->a),
-                    x2.Right + (float)((input.Right - y2.Right) * this->Params->a)};
+                    x2->Left + (float)((input.Left - y2->Left) * this->Params->a),
+                    x2->Right + (float)((input.Right - y2->Right) * this->Params->a)};
 
-                y0 = output;
+                *y0 = output;
 
                 return output;
             };
 
-            virtual void Increment() override
+            inline virtual void Increment() override
             {
                 //shuffle inputs
                 x2 = x1;
@@ -69,13 +78,13 @@ namespace ByteFarm
         private:
             float a;
 
-            LRSample32F x0;
-            LRSample32F x1;
-            LRSample32F x2;
+            LRSample32F *x0 = new LRSample32F{0};
+            LRSample32F *x1 = new LRSample32F{0};
+            LRSample32F *x2 = new LRSample32F{0};
 
-            LRSample32F y0;
-            LRSample32F y1;
-            LRSample32F y2;
+            LRSample32F *y0 = new LRSample32F{0};
+            LRSample32F *y1 = new LRSample32F{0};
+            LRSample32F *y2 = new LRSample32F{0};
         };
         template <size_t SAMPLERATE>
         class AllPassFilterCascade
@@ -102,7 +111,7 @@ namespace ByteFarm
                 delete allpassfilters;
             };
 
-            virtual void Increment()
+            inline virtual void Increment()
             {
                 for (uint8_t i = 0; i < numfilters; i++)
                 {
@@ -114,14 +123,10 @@ namespace ByteFarm
             LRSample32F Process(LRSample32F input)
             {
                 LRSample32F output = input;
-
-                int i = 0;
-
                 for (uint8_t i = 0; i < numfilters; i++)
                 {
                     output = allpassfilters[i]->Process(output);
                 }
-
                 return output;
             };
 
@@ -270,13 +275,13 @@ namespace ByteFarm
                 delete filter_b;
             };
 
-            virtual void Increment()
+            inline virtual void Increment()
             {
                 filter_a->Increment();
                 filter_b->Increment();
             }
 
-            virtual LRSample32F Process(const LRSample32F input) override
+            inline virtual LRSample32F Process(const LRSample32F input) override
             {
                 const LRSample32F temp = filter_a->Process(input);
                 const LRSample32F output{(temp.Left + oldout.Left) * 0.5f, (temp.Right + oldout.Right) * 0.5f};

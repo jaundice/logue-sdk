@@ -41,6 +41,8 @@
 #include "userosc.h"
 #include "wavetableone.hpp"
 #include "WaveTableOneOscModule.hpp"
+#include "XD.hpp"
+
 #define SAMPLERATE 48000
 ByteFarm::Dsp::WaveTableOneModule<SAMPLERATE> _module;
 

@@ -40,6 +40,8 @@
 
 #include "usermodfx.h"
 #include "PolyPhaseModule.hpp"
+#include "XD.hpp"
+
 #define SAMPLERATE 48000
 ByteFarm::Dsp::PolyPhaseMultiModule<SAMPLERATE> _module;
 

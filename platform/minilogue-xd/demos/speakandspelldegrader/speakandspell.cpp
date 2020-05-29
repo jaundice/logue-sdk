@@ -40,6 +40,8 @@
 
 #include "usermodfx.h"
 #include "speakandspelldegradermodule.hpp"
+#include "XD.hpp"
+
 #define SAMPLERATE 48000
 
 ByteFarm::Dsp::SpeakAndSpellDegraderModule<SAMPLERATE> _module;

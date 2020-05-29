@@ -9,6 +9,8 @@
 #include "Envelope.hpp"
 #include "userosc.h"
 
+
+
 namespace ByteFarm
 {
     namespace Dsp
@@ -57,7 +59,7 @@ namespace ByteFarm
             for (uint8_t i = 0; i < NumEnvelopes; i++)
             {
                 //Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>((Attack | Decay | Sustain | Release), 200.f, 3000.f * i, 2000.f, 500.f * i, 5000.f * i, 0.75f);
-                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(Delay | Attack | Hold | Decay | Sustain | Release, //envelope segments
+                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(Delay | Attack | Hold | Decay | Sustain | Release | Loop, //envelope segments
                                                                      1.f + 3.f * fabs(osc_white()),                     //delay
                                                                      2.f + 50.f * fabs(osc_white()),                    //attack
                                                                      200.f + 400.f * fabs(osc_white()),                 //hold
@@ -73,12 +75,12 @@ namespace ByteFarm
             return voices;
         };
 
-        template <size_t SAMPLERATE>
+        template <size_t SAMPLERATE, size_t NumOscillators, size_t NumEnvelopes>
         class SuperOscModule : public OscModule<1, SAMPLERATE>
         {
 
         public:
-            SuperOscModule(ByteFarm::Tools::CommonWaveShapes waveType) : OscModule<1, SAMPLERATE>(GetVoices<16, 16, 1024, SAMPLERATE>(waveType))
+            SuperOscModule(ByteFarm::Tools::CommonWaveShapes waveType) : OscModule<1, SAMPLERATE>(GetVoices<NumOscillators, NumEnvelopes, 1024, SAMPLERATE>(waveType))
             {
             }
 
@@ -91,25 +93,25 @@ namespace ByteFarm
                 {
                 case k_user_osc_param_id1:
                 {
-                    voice->SetSlop((float)value/100.f);
+                    voice->SetSlop(param_val_to_f32(value) * 0.5f + 0.5f);
                     break;
                 }
                 case k_user_osc_param_id2:
                 {
                     for (uint8_t i = 0; i < voice->Envelopes.Size(); i++)
                     {
-                        voice->Envelopes.Get(i)->SetSlop((float)value/100.f);
+                        voice->Envelopes.Get(i)->SetSlop(param_val_to_f32(value) * 0.5f + 0.5f);
                     }
                     break;
                 }
                 case k_user_osc_param_id3:
                 {
-                    voice->AmpModulator = (float)value/100.f;
+                    voice->AmpModulator = param_val_to_f32(value) * 0.5f + 0.5f;
                     break;
                 }
                 case k_user_osc_param_id4:
                 {
-                    voice->TuningModifier->SetSemis(value);
+                    voice->TuningModifier->SetSemis(value -100);
                     break;
                 }
                 case k_user_osc_param_id5:
@@ -139,32 +141,32 @@ namespace ByteFarm
                 }
             };
         };
-        template <size_t SAMPLERATE>
-        class SuperSawModule : public SuperOscModule<SAMPLERATE>
+        template <size_t SAMPLERATE, size_t NumOscillators, size_t NumEnvelopes>
+        class SuperSawModule : public SuperOscModule<SAMPLERATE, NumOscillators, NumEnvelopes>
         {
 
         public:
-            SuperSawModule() : SuperOscModule<SAMPLERATE>(ByteFarm::Tools::CommonWaveShapes::Saw)
+            SuperSawModule() : SuperOscModule<SAMPLERATE, NumOscillators, NumEnvelopes>(ByteFarm::Tools::CommonWaveShapes::Saw)
             {
             }
         };
 
-        template <size_t SAMPLERATE>
-        class SuperTriModule : public SuperOscModule<SAMPLERATE>
+        template <size_t SAMPLERATE, size_t NumOscillators, size_t NumEnvelopes>
+        class SuperTriModule : public SuperOscModule<SAMPLERATE, NumOscillators, NumEnvelopes>
         {
 
         public:
-            SuperTriModule() : SuperOscModule<SAMPLERATE>(ByteFarm::Tools::CommonWaveShapes::Tri)
+            SuperTriModule() : SuperOscModule<SAMPLERATE, NumOscillators, NumEnvelopes>(ByteFarm::Tools::CommonWaveShapes::Tri)
             {
             }
         };
 
-        template <size_t SAMPLERATE>
-        class SuperSquareModule : public SuperOscModule<SAMPLERATE>
+        template <size_t SAMPLERATE, size_t NumOscillators, size_t NumEnvelopes>
+        class SuperSquareModule : public SuperOscModule<SAMPLERATE, NumOscillators, NumEnvelopes>
         {
 
         public:
-            SuperSquareModule() : SuperOscModule<SAMPLERATE>(ByteFarm::Tools::CommonWaveShapes::Sqr)
+            SuperSquareModule() : SuperOscModule<SAMPLERATE, NumOscillators, NumEnvelopes>(ByteFarm::Tools::CommonWaveShapes::Sqr)
             {
             }
         };

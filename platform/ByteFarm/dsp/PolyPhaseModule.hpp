@@ -183,27 +183,30 @@ namespace ByteFarm
 					this->Elements->Get(elementIdx)->Increment();
 					result1 = this->Elements->Get(elementIdx)->Process(result1);
 
-					this->Elements->Get(elementIdx + 6)->Increment();
-					result2 = this->Elements->Get(elementIdx + 6)->Process(result2);
+					//this->Elements->Get(elementIdx + 6)->Increment();
+					//result2 = this->Elements->Get(elementIdx + 6)->Process(result2);
 
-					*(my++) = fx_softclipf(0.95f, /*  0.5f * s + 0.5f * */ mix * result1.Left + (1.f - mix) * result2.Left);
-					*(my++) = fx_softclipf(0.95f, /* 0.5f * s2 + 0.5f * */ mix * result1.Right + (1.f - mix) * result2.Right);
+					*(my++) = fx_softclipf(0.025, /*  0.5f * s + 0.5f * */ result1.Left);  // + (1.f - mix) * s);
+					*(my++) = fx_softclipf(0.025, /* 0.5f * s2 + 0.5f * */ result1.Right); // + (1.f - mix) * s2);
 				}
 			}
 
 			virtual void UpdateParams(uint8_t paramIndex, int32_t value) override
 			{
-				float val = fabs(q31_to_f32(value));
+				float val = q31_to_f32(value);
 				switch (paramIndex)
 				{
 				case 0:
 				{
-					uint8_t newIdx = (uint8_t)(val * 5.f);
+					int8_t newIdx = value %12; //(int8_t)fabsf(val * 12.f);
+					//newIdx+=6;
+					if (newIdx > 11)
+						newIdx = 11;
 					if (this->elementIdx != newIdx)
 					{
 						this->elementIdx = newIdx;
-						this->Elements->Get(newIdx)->Reset();
-						this->Elements->Get(newIdx + 6)->Reset();
+						//this->Elements->Get(newIdx)->Reset();
+						//this->Elements->Get(newIdx + 6)->Reset();
 					}
 				}
 				case 1:

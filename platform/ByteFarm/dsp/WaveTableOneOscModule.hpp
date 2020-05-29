@@ -89,25 +89,25 @@ namespace ByteFarm
                 {
                 case k_user_osc_param_id1:
                 {
-                    voice->SetSlop((float)value/100.f);
+                    voice->SetSlop(param_val_to_f32(value)* 0.5f + 0.5f);
                     break;
                 }
                 case k_user_osc_param_id2:
                 {
                     for(uint8_t i = 0;i <voice->Envelopes.Size();i++)
                     {
-                        voice->Envelopes.Get(i)->SetSlop((float)value/100.f);
+                        voice->Envelopes.Get(i)->SetSlop(param_val_to_f32(value)* 0.5f + 0.5f);
                     }
                     break;
                 }
                 case k_user_osc_param_id3:
                 {
-                    voice->AmpModulator = (float)value/100.f;
+                    voice->AmpModulator = param_val_to_f32(value)* 0.5f + 0.5f;
                     break;
                 }
                 case k_user_osc_param_id4:
                 {
-                    voice->TuningModifier->SetSemis(value);
+                    voice->TuningModifier->SetSemis(value-100);
                     break;
                 }
                 case k_user_osc_param_id5:

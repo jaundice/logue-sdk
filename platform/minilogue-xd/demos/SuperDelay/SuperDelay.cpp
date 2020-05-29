@@ -11,6 +11,7 @@
 
 #include "userdelfx.h"
 #include "SuperDelayModule.hpp"
+#include "XD.hpp"
 
 #define SAMPLERATE 48000
 

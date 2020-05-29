@@ -40,6 +40,8 @@
 
 #include "usermodfx.h"
 #include "WaveFolderModule.hpp"
+#include "NTS.hpp"
+
 #define SAMPLERATE 48000
 ByteFarm::Dsp::WaveFolderModule<SAMPLERATE> _module;
 
