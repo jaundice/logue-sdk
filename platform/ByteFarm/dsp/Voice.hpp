@@ -24,7 +24,7 @@ namespace ByteFarm
         {
 
         protected:
-            float NoteToHz(uint8_t note, float mod)
+            inline float NoteToHz(uint8_t note, float mod)
             {
                 const float f0 = osc_notehzf(note);
                 const float f1 = osc_notehzf(note + 1);

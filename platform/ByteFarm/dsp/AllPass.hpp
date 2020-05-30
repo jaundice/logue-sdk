@@ -9,27 +9,18 @@ namespace ByteFarm
 {
     namespace Dsp
     {
-
-        class AllPassFilterParams
+        class AllPassFilter 
         {
-        public:
-            float a;
-            AllPassFilterParams(float aa)
-            {
-                a = aa;
-            }
-        };
+            float Coefficient;
 
-        template <size_t SAMPLERATE>
-        class AllPassFilter : public FxElement<AllPassFilterParams, SAMPLERATE>
-        {
         public:
-            AllPassFilter(AllPassFilterParams *params) : FxElement<AllPassFilterParams, SAMPLERATE>(params)
+            AllPassFilter(float coefficient) 
             {
+                Coefficient = coefficient;
                 Reset();
             };
 
-            virtual void Reset() override
+            void Reset()
             {
 
                 *x0 = LRSample32F{0.f, 0.f};
@@ -40,6 +31,7 @@ namespace ByteFarm
                 *y1 = LRSample32F{0.f, 0.f};
                 *y2 = LRSample32F{0.f, 0.f};
             }
+
             ~AllPassFilter()
             {
                 delete x0;
@@ -50,22 +42,17 @@ namespace ByteFarm
                 delete y2;
             }
 
-            inline virtual LRSample32F Process(LRSample32F input) override
+            inline LRSample32F Process(LRSample32F input)
             {
                 *x0 = input;
 
                 //allpass filter 1
                 const LRSample32F output{
-                    x2->Left + (float)((input.Left - y2->Left) * this->Params->a),
-                    x2->Right + (float)((input.Right - y2->Right) * this->Params->a)};
+                    x2->Left + (float)((input.Left - y2->Left) * this->Coefficient),
+                    x2->Right + (float)((input.Right - y2->Right) * this->Coefficient)};
 
                 *y0 = output;
 
-                return output;
-            };
-
-            inline virtual void Increment() override
-            {
                 //shuffle inputs
                 x2 = x1;
                 x1 = x0;
@@ -73,11 +60,12 @@ namespace ByteFarm
                 //shuffle outputs
                 y2 = y1;
                 y1 = y0;
+
+                return output;
             };
 
         private:
-            float a;
-
+            
             LRSample32F *x0 = new LRSample32F{0};
             LRSample32F *x1 = new LRSample32F{0};
             LRSample32F *x2 = new LRSample32F{0};
@@ -86,44 +74,44 @@ namespace ByteFarm
             LRSample32F *y1 = new LRSample32F{0};
             LRSample32F *y2 = new LRSample32F{0};
         };
-        template <size_t SAMPLERATE>
+
+
+        template <size_t SAMPLERATE, uint8_t NumFilters>
         class AllPassFilterCascade
         {
+
         public:
-            AllPassFilterCascade(float *coefficients, const uint8_t numCoefficients)
+            AllPassFilterCascade(float *coefficients)
             {
-                numfilters = numCoefficients;
-                allpassfilters = (AllPassFilter<SAMPLERATE> **)malloc(sizeof(AllPassFilter<SAMPLERATE> *) * numCoefficients);
-                for (uint8_t i = 0; i < numfilters; i++)
+                for (uint8_t i = 0; i < NumFilters; i++)
                 {
                     float c = (coefficients)[i];
-                    AllPassFilterParams *p = new AllPassFilterParams(c);
-                    AllPassFilter<SAMPLERATE> *f = new AllPassFilter<SAMPLERATE>(p);
+                    AllPassFilter *f = new AllPassFilter(c);
                     allpassfilters[i] = f;
                 }
             };
             ~AllPassFilterCascade()
             {
-                for (uint8_t i = 0; i < numfilters; i++)
+                for (uint8_t i = 0; i < NumFilters; i++)
                 {
                     delete allpassfilters[i];
                 }
-                delete allpassfilters;
+                //delete allpassfilters;
             };
 
             inline virtual void Increment()
             {
-                for (uint8_t i = 0; i < numfilters; i++)
-                {
-                    allpassfilters[i]->Increment();
-                    /* code */
-                }
+                // for (uint8_t i = 0; i < numfilters; i++)
+                // {
+                //     allpassfilters[i]->Increment();
+                //     /* code */
+                // }
             };
 
             LRSample32F Process(LRSample32F input)
             {
                 LRSample32F output = input;
-                for (uint8_t i = 0; i < numfilters; i++)
+                for (uint8_t i = 0; i < NumFilters; i++)
                 {
                     output = allpassfilters[i]->Process(output);
                 }
@@ -131,8 +119,7 @@ namespace ByteFarm
             };
 
         private:
-            AllPassFilter<SAMPLERATE> **allpassfilters;
-            uint8_t numfilters;
+            AllPassFilter *allpassfilters[NumFilters];
         };
 
         enum HalfBandFilterOrder
@@ -156,14 +143,12 @@ namespace ByteFarm
         public:
             float *a_coefficients;
             float *b_coefficients;
-            uint8_t NumCoefficients;
 
             static CascadedAllPassFilterParams *HalfBandFilter(HalfBandFilterOrder order, HalfBandFilterAngle angle)
             {
 
                 float *a;
                 float *b;
-                uint8_t n;
 
                 switch (angle)
                 {
@@ -172,34 +157,28 @@ namespace ByteFarm
                     switch (order)
                     {
                     case TWELVEPOLE:
-                        a = (float *)C12S->a_coefficients.Ptr();
-                        b = (float *)C12S->b_coefficients.Ptr();
-                        n = C12S->NumCoefficients;
+                        a = (float *)C12S.a_coefficients;
+                        b = (float *)C12S.b_coefficients;
                         break;
                     case TENPOLE:
-                        a = (float *)C10S->a_coefficients.Ptr();
-                        b = (float *)C10S->b_coefficients.Ptr();
-                        n = C10S->NumCoefficients;
+                        a = (float *)C10S.a_coefficients;
+                        b = (float *)C10S.b_coefficients;
                         break;
                     case EIGHTPOLE:
-                        a = (float *)C8S->a_coefficients.Ptr();
-                        b = (float *)C8S->b_coefficients.Ptr();
-                        n = C8S->NumCoefficients;
+                        a = (float *)C8S.a_coefficients;
+                        b = (float *)C8S.b_coefficients;
                         break;
                     case SIXPOLE:
-                        a = (float *)C6S->a_coefficients.Ptr();
-                        b = (float *)C6S->b_coefficients.Ptr();
-                        n = C6S->NumCoefficients;
+                        a = (float *)C6S.a_coefficients;
+                        b = (float *)C6S.b_coefficients;
                         break;
                     case FOURPOLE:
-                        a = (float *)C4S->a_coefficients.Ptr();
-                        b = (float *)C4S->b_coefficients.Ptr();
-                        n = C4S->NumCoefficients;
+                        a = (float *)C4S.a_coefficients;
+                        b = (float *)C4S.b_coefficients;
                         break;
                     case TWOPOLE:
-                        a = (float *)C2S->a_coefficients.Ptr();
-                        b = (float *)C2S->b_coefficients.Ptr();
-                        n = C2S->NumCoefficients;
+                        a = (float *)C2S.a_coefficients;
+                        b = (float *)C2S.b_coefficients;
                         break;
                     default:
                         a = {};
@@ -213,38 +192,28 @@ namespace ByteFarm
                     switch (order)
                     {
                     case TWELVEPOLE:
-                        a = (float *)C12G->a_coefficients.Ptr();
-                        b = (float *)C12G->b_coefficients.Ptr();
-                        n = C12G->NumCoefficients;
+                        a = (float *)C12G.a_coefficients;
+                        b = (float *)C12G.b_coefficients;
                         break;
                     case TENPOLE:
-                        a = (float *)C10G->a_coefficients.Ptr();
-                        b = (float *)C10G->b_coefficients.Ptr();
-                        n = C10G->NumCoefficients;
+                        a = (float *)C10G.a_coefficients;
+                        b = (float *)C10G.b_coefficients;
                         break;
                     case EIGHTPOLE:
-                        a = (float *)C8G->a_coefficients.Ptr();
-                        b = (float *)C8G->b_coefficients.Ptr();
-                        n = C8G->NumCoefficients;
+                        a = (float *)C8G.a_coefficients;
+                        b = (float *)C8G.b_coefficients;
                         break;
                     case SIXPOLE:
-                        a = (float *)C6G->a_coefficients.Ptr();
-                        b = (float *)C6G->b_coefficients.Ptr();
-                        n = C6G->NumCoefficients;
+                        a = (float *)C6G.a_coefficients;
+                        b = (float *)C6G.b_coefficients;
                         break;
                     case FOURPOLE:
-                        a = (float *)C4G->a_coefficients.Ptr();
-                        b = (float *)C4G->b_coefficients.Ptr();
-                        n = C4G->NumCoefficients;
+                        a = (float *)C4G.a_coefficients;
+                        b = (float *)C4G.b_coefficients;
                         break;
                     case TWOPOLE:
-                        a = (float *)C2G->a_coefficients.Ptr();
-                        b = (float *)C2G->b_coefficients.Ptr();
-                        n = C2G->NumCoefficients;
-                        break;
-                    default:
-                        a = {};
-                        b = {};
+                        a = (float *)C2G.a_coefficients;
+                        b = (float *)C2G.b_coefficients;
                         break;
                     }
                     break;
@@ -253,20 +222,19 @@ namespace ByteFarm
                 }
                 return new CascadedAllPassFilterParams{
                     a,
-                    b,
-                    n};
+                    b};
             }; // namespace Dsp
         };
 
-        template <size_t SAMPLERATE>
+        template <size_t SAMPLERATE, uint8_t NumFilters>
         class HalfBandFilter : public FxElement<CascadedAllPassFilterParams, SAMPLERATE>
         {
         public:
             HalfBandFilter(CascadedAllPassFilterParams *params) : FxElement<CascadedAllPassFilterParams, SAMPLERATE>(params)
             {
 
-                filter_a = new AllPassFilterCascade<SAMPLERATE>(this->Params->a_coefficients, this->Params->NumCoefficients);
-                filter_b = new AllPassFilterCascade<SAMPLERATE>(this->Params->b_coefficients, this->Params->NumCoefficients);
+                filter_a = new AllPassFilterCascade<SAMPLERATE, NumFilters>(this->Params->a_coefficients);
+                filter_b = new AllPassFilterCascade<SAMPLERATE, NumFilters>(this->Params->b_coefficients);
                 oldout = LRSample32F{0.f, 0.f};
             };
             ~HalfBandFilter()
@@ -277,8 +245,8 @@ namespace ByteFarm
 
             inline virtual void Increment()
             {
-                filter_a->Increment();
-                filter_b->Increment();
+                // filter_a->Increment();
+                // filter_b->Increment();
             }
 
             inline virtual LRSample32F Process(const LRSample32F input) override
@@ -290,8 +258,8 @@ namespace ByteFarm
             }
 
         private:
-            AllPassFilterCascade<SAMPLERATE> *filter_a;
-            AllPassFilterCascade<SAMPLERATE> *filter_b;
+            AllPassFilterCascade<SAMPLERATE, NumFilters> *filter_a;
+            AllPassFilterCascade<SAMPLERATE, NumFilters> *filter_b;
             LRSample32F oldout;
         };
 

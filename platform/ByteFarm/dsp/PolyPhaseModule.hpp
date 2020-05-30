@@ -8,23 +8,23 @@ namespace ByteFarm
 {
 	namespace Dsp
 	{
-		template <size_t SAMPLERATE>
+		template <size_t SAMPLERATE, uint8_t NumFilters>
 		TypedArray<FxElementBase *, 1, uint8_t> *GetElements(HalfBandFilterOrder order, HalfBandFilterAngle angle)
 		{
 
 			TypedArray<FxElementBase *, 1, uint8_t> *elements = new TypedArray<FxElementBase *, 1, uint8_t>();
 
 			CascadedAllPassFilterParams *p = CascadedAllPassFilterParams::HalfBandFilter(order, angle);
-			HalfBandFilter<SAMPLERATE> *hbf = new HalfBandFilter<SAMPLERATE>(p);
+			HalfBandFilter<SAMPLERATE, NumFilters> *hbf = new HalfBandFilter<SAMPLERATE, NumFilters>(p);
 
 			elements->Set(0, hbf);
 			return elements;
 		}
-		template <size_t SAMPLERATE>
-		HalfBandFilter<SAMPLERATE> *GetFilter(HalfBandFilterOrder order, HalfBandFilterAngle angle)
+		template <size_t SAMPLERATE, uint8_t NumFilters>
+		HalfBandFilter<SAMPLERATE, NumFilters> *GetFilter(HalfBandFilterOrder order, HalfBandFilterAngle angle)
 		{
 			CascadedAllPassFilterParams *p = CascadedAllPassFilterParams::HalfBandFilter(order, angle);
-			HalfBandFilter<SAMPLERATE> *hbf = new HalfBandFilter<SAMPLERATE>(p);
+			HalfBandFilter<SAMPLERATE, NumFilters> *hbf = new HalfBandFilter<SAMPLERATE, NumFilters>(p);
 			return hbf;
 		}
 
@@ -34,121 +34,25 @@ namespace ByteFarm
 
 			TypedArray<FxElementBase *, 12, uint8_t> *elements = new TypedArray<FxElementBase *, 12, uint8_t>();
 
-			elements->Set(0, GetFilter<SAMPLERATE>(HalfBandFilterOrder::TWOPOLE, HalfBandFilterAngle::GENTLE));
-			elements->Set(1, GetFilter<SAMPLERATE>(HalfBandFilterOrder::FOURPOLE, HalfBandFilterAngle::GENTLE));
-			elements->Set(2, GetFilter<SAMPLERATE>(HalfBandFilterOrder::SIXPOLE, HalfBandFilterAngle::GENTLE));
-			elements->Set(3, GetFilter<SAMPLERATE>(HalfBandFilterOrder::EIGHTPOLE, HalfBandFilterAngle::GENTLE));
-			elements->Set(4, GetFilter<SAMPLERATE>(HalfBandFilterOrder::TENPOLE, HalfBandFilterAngle::GENTLE));
-			elements->Set(5, GetFilter<SAMPLERATE>(HalfBandFilterOrder::TWELVEPOLE, HalfBandFilterAngle::GENTLE));
-			elements->Set(6, GetFilter<SAMPLERATE>(HalfBandFilterOrder::TWOPOLE, HalfBandFilterAngle::STEEP));
-			elements->Set(7, GetFilter<SAMPLERATE>(HalfBandFilterOrder::FOURPOLE, HalfBandFilterAngle::STEEP));
-			elements->Set(8, GetFilter<SAMPLERATE>(HalfBandFilterOrder::SIXPOLE, HalfBandFilterAngle::STEEP));
-			elements->Set(9, GetFilter<SAMPLERATE>(HalfBandFilterOrder::EIGHTPOLE, HalfBandFilterAngle::STEEP));
-			elements->Set(10, GetFilter<SAMPLERATE>(HalfBandFilterOrder::TENPOLE, HalfBandFilterAngle::STEEP));
-			elements->Set(11, GetFilter<SAMPLERATE>(HalfBandFilterOrder::TWELVEPOLE, HalfBandFilterAngle::STEEP));
+			elements->Set(0, GetFilter<SAMPLERATE, 2>(HalfBandFilterOrder::TWOPOLE, HalfBandFilterAngle::GENTLE));
+			elements->Set(1, GetFilter<SAMPLERATE, 4>(HalfBandFilterOrder::FOURPOLE, HalfBandFilterAngle::GENTLE));
+			elements->Set(2, GetFilter<SAMPLERATE, 6>(HalfBandFilterOrder::SIXPOLE, HalfBandFilterAngle::GENTLE));
+			elements->Set(3, GetFilter<SAMPLERATE, 8>(HalfBandFilterOrder::EIGHTPOLE, HalfBandFilterAngle::GENTLE));
+			elements->Set(4, GetFilter<SAMPLERATE, 10>(HalfBandFilterOrder::TENPOLE, HalfBandFilterAngle::GENTLE));
+			elements->Set(5, GetFilter<SAMPLERATE, 12>(HalfBandFilterOrder::TWELVEPOLE, HalfBandFilterAngle::GENTLE));
+			elements->Set(6, GetFilter<SAMPLERATE, 2>(HalfBandFilterOrder::TWOPOLE, HalfBandFilterAngle::STEEP));
+			elements->Set(7, GetFilter<SAMPLERATE, 4>(HalfBandFilterOrder::FOURPOLE, HalfBandFilterAngle::STEEP));
+			elements->Set(8, GetFilter<SAMPLERATE, 6>(HalfBandFilterOrder::SIXPOLE, HalfBandFilterAngle::STEEP));
+			elements->Set(9, GetFilter<SAMPLERATE, 8>(HalfBandFilterOrder::EIGHTPOLE, HalfBandFilterAngle::STEEP));
+			elements->Set(10, GetFilter<SAMPLERATE, 10>(HalfBandFilterOrder::TENPOLE, HalfBandFilterAngle::STEEP));
+			elements->Set(11, GetFilter<SAMPLERATE, 12>(HalfBandFilterOrder::TWELVEPOLE, HalfBandFilterAngle::STEEP));
 			return elements;
 		}
-
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule12S : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule12S() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(TWELVEPOLE, STEEP))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule10S : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule10S() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(TENPOLE, STEEP))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule8S : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule8S() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(EIGHTPOLE, STEEP))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule6S : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule6S() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(SIXPOLE, STEEP))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule4S : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule4S() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(FOURPOLE, STEEP))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule2S : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule2S() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(TWOPOLE, STEEP))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule12G : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule12G() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(TWELVEPOLE, GENTLE))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule10G : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule10G() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(TENPOLE, GENTLE))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule8G : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule8G() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(EIGHTPOLE, GENTLE))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule6G : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule6G() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(SIXPOLE, GENTLE))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule4G : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule4G() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(FOURPOLE, GENTLE))
-			{
-			}
-		};
-		template <size_t SAMPLERATE>
-		class PolyPhaseModule2G : public FxModule<1, SAMPLERATE>
-		{
-		public:
-			PolyPhaseModule2G() : FxModule<1, SAMPLERATE>(GetElements<SAMPLERATE>(TWOPOLE, GENTLE))
-			{
-			}
-		};
+		
 		template <size_t SAMPLERATE>
 		class PolyPhaseMultiModule : public FxModule<12, SAMPLERATE>
 		{
-			uint8_t elementIdx = 0;
+			uint8_t elementIdx = 11;
 			float mix = 0.f;
 
 		public:
@@ -176,18 +80,11 @@ namespace ByteFarm
 					float s = (*mx++);
 					float s2 = (*mx++);
 
-					ByteFarm::Dsp::LRSample32F result1{s, s2};
-					ByteFarm::Dsp::LRSample32F result2{s, s2};
-
-					//we only want to use the selected fxelement
-					this->Elements->Get(elementIdx)->Increment();
-					result1 = this->Elements->Get(elementIdx)->Process(result1);
-
-					//this->Elements->Get(elementIdx + 6)->Increment();
-					//result2 = this->Elements->Get(elementIdx + 6)->Process(result2);
-
-					*(my++) = fx_softclipf(0.025, /*  0.5f * s + 0.5f * */ result1.Left);  // + (1.f - mix) * s);
-					*(my++) = fx_softclipf(0.025, /* 0.5f * s2 + 0.5f * */ result1.Right); // + (1.f - mix) * s2);
+					LRSample32F result= this->Elements->Get(elementIdx)->Process(LRSample32F{s, s2});
+					
+					
+					*(my++) = fx_softclipf(0.025, result.Left);
+					*(my++) = fx_softclipf(0.025, result.Right);
 				}
 			}
 
@@ -198,20 +95,17 @@ namespace ByteFarm
 				{
 				case 0:
 				{
-					int8_t newIdx = value %12; //(int8_t)fabsf(val * 12.f);
-					//newIdx+=6;
+					uint8_t newIdx = (uint8_t)roundf((val * 6.f)+6.f);
 					if (newIdx > 11)
 						newIdx = 11;
-					if (this->elementIdx != newIdx)
-					{
+					
 						this->elementIdx = newIdx;
-						//this->Elements->Get(newIdx)->Reset();
-						//this->Elements->Get(newIdx + 6)->Reset();
-					}
+					break;
 				}
 				case 1:
 				{
 					this->mix = val;
+					break;
 				}
 				}
 			};

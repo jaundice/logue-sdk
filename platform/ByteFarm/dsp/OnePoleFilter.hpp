@@ -31,10 +31,8 @@ namespace ByteFarm
 
 			LRSample32F Process(LRSample32F input) override
 			{
-				const LRSample32F delta{
-					input.Left - _last.Left,
-					input.Right - _last.Right};
-
+				const LRSample32F delta = input - _last;
+				
 				_last = _last + (delta * this->Params->Cutoff);
 
 				return _last;
