@@ -38,3 +38,7 @@ cd ../
 cd SuperDelay
 make clean
 make
+cd ../
+cd FM
+make clean
+make

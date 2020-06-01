@@ -40,7 +40,7 @@ namespace ByteFarm
         template <size_t SampleRate>
         class Envelope
         {
-            const uint16_t FramesPerMs = SampleRate / 1000;
+            const static uint16_t FramesPerMs = SampleRate / 1000;
             EnvelopeStage Stages{Off};
             EnvelopeSlope Slope{EnvelopeSlope::Linear};
             EnvelopeStage CurrentStage{EnvelopeStage::Off};

@@ -1,0 +1,21 @@
+{
+    "header" : 
+    {
+        "platform" : "minilogue-xd",
+        "module" : "osc",
+        "api" : "1.1-0",
+        "dev_id" : 0,
+        "prg_id" : 0,
+        "version" : "1.0-1",
+        "name" : "FM",
+        "num_param" : 6,
+        "params" : [
+            ["Tuning Slop",   0,  100,  "%"],
+            ["Envelope Slop", 0,  100,  "%"],
+            ["Fixed Amp Modulation", 0,  100,  "%"],
+            ["Tuning",     -36, 36, "%"],
+            ["TODO",    0, 100, "%"],
+            ["TODO",   0, 100, "%"]
+          ]
+    }
+}

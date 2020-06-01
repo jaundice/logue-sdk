@@ -13,6 +13,7 @@ namespace ByteFarm
             float stride;
             float index = 0.f;
             float startPhase = 0.f;
+            float value = 0.f;
 
         public:
             LUTOsc(float * lut, float startPhase = 0.f)
@@ -55,7 +56,12 @@ namespace ByteFarm
                     idx -= LUTLength;
 
                 index = idx;
-                return ((1.f - rat) * f1) + (rat * f2);
+                value =  ((1.f - rat) * f1) + (rat * f2);
+                return value;
+            }
+
+            float Value(){
+                return value;
             }
         };
     } // namespace Dsp
