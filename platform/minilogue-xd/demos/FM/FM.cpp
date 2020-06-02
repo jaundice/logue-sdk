@@ -43,7 +43,7 @@
 #include "XD.hpp"
 
 #define SAMPLERATE 48000
-ByteFarm::Dsp::SixOpFMModule<SAMPLERATE> _module;
+ByteFarm::Dsp::SixOpFMModule<SAMPLERATE, 1024> _module;
 
 void OSC_INIT(uint32_t platform, uint32_t api)
 {

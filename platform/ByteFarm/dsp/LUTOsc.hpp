@@ -43,6 +43,9 @@ namespace ByteFarm
                 float idx2 = idx + 1.f;
                 if (idx2 >= LUTLength)
                     idx2 -= LUTLength;
+                else if(idx2 < 0 ){
+                    idx2 += LUTLength;
+                }
 
 
                 //linear interpolation
@@ -54,6 +57,8 @@ namespace ByteFarm
                 idx += stride;
                 if (idx >= LUTLength)
                     idx -= LUTLength;
+                else if(idx < 0)
+                    idx += LUTLength;
 
                 index = idx;
                 value =  ((1.f - rat) * f1) + (rat * f2);

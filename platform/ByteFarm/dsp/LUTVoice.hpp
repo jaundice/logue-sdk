@@ -40,13 +40,14 @@ namespace ByteFarm
 
                 note += SemiTones;
 
-                if (note < 0)
+                while (note < 0)
                 {
-                    do
-                    {
-                        note += 12;
-                    } while (note < 0);
-                }
+                    note += 12;
+                };
+                while (note > 126)
+                {
+                    note -= 12;
+                };
 
                 return (int16_t)note;
             }
@@ -79,14 +80,15 @@ namespace ByteFarm
                 note += Modifier[oscillatorIndex];
                 note += SemiTones;
 
-                if (note < 0)
+                while (note < 0)
                 {
+                    note += 12;
+                };
 
-                    do
-                    {
-                        note += 12;
-                    } while (note < 0);
-                }
+                while (note > 126)
+                {
+                    note -= 12;
+                };
 
                 return (int16_t)note;
             }
