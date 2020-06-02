@@ -38,23 +38,23 @@ namespace ByteFarm
 				CalculateFeedbackAmount();
 			}
 
-			void SetPoles(FilterPoles poles)
+			inline void SetPoles(FilterPoles poles)
 			{
 				Poles = poles;
 			}
 
-			void SetCutoff(float cutoff)
+			inline void SetCutoff(float cutoff)
 			{
 				Cutoff = cutoff;
 				CalculateFeedbackAmount();
 			};
 
-			void SetResonance(float resonance)
+			inline void SetResonance(float resonance)
 			{
 				Resonance = fmaxf(fminf(resonance, 0.9999), 0.0001);
 				CalculateFeedbackAmount();
 			};
-			void SetFilterMode(FilterMode mode) { Mode = mode; }
+			inline void SetFilterMode(FilterMode mode) { Mode = mode; }
 
 		private:
 			void CalculateFeedbackAmount() { FeedbackAmount = Resonance + Resonance / (1.0f - Cutoff); }

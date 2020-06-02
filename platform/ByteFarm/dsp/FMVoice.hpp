@@ -43,7 +43,7 @@ namespace ByteFarm
 
             int8_t PitchOffset = 0;
 
-            uint8_t GetAlgorithmIndex()
+            inline uint8_t GetAlgorithmIndex()
             {
                 return this->AlgorithmIndex;
             }
@@ -72,7 +72,7 @@ namespace ByteFarm
                 }
             }
 
-            void SetAlgorithm(uint8_t index, FMAlgorithm<NumOscillators, LUTLength, SampleRate> *algo)
+            inline void SetAlgorithm(uint8_t index, FMAlgorithm<NumOscillators, LUTLength, SampleRate> *algo)
             {
                 if (this->Algorithm != nullptr)
                     delete this->Algorithm;
@@ -81,12 +81,12 @@ namespace ByteFarm
                 this->AlgorithmIndex = index;
             }
 
-            void SetRate(uint8_t oscIndex, float rate)
+            inline void SetRate(uint8_t oscIndex, float rate)
             {
                 this->OscRatio[oscIndex] = rate;
             }
 
-            float Generate() override
+            inline float Generate() override
             {
                 for (uint8_t i = 0; i < NumOscillators + 1; i++)
                 {
@@ -128,7 +128,7 @@ namespace ByteFarm
                 this->Algorithm->SetBaseFreq(freq);
             };
 
-            Envelope<SampleRate> *GetEnvelope(uint8_t envIdx)
+            inline Envelope<SampleRate> *GetEnvelope(uint8_t envIdx)
             {
                 return Envelopes[envIdx];
             }
@@ -165,12 +165,12 @@ namespace ByteFarm
             FMVoice<6, LUTLength, SampleRate> *Voice;
             float Normalize = 1.f;
 
-            float GetOscillatorValue(uint8_t opIndex)
+            inline float GetOscillatorValue(uint8_t opIndex)
             {
                 return this->Voice->Oscillators[opIndex]->NextSample() * this->Voice->Envelopes[opIndex]->CurrentValue() * this->Voice->OperatorLevel[opIndex];
             }
 
-            void SetOscillatorFrequency(uint8_t oscIndex, float modValue)
+            inline void SetOscillatorFrequency(uint8_t oscIndex, float modValue)
             {
                 this->Voice->Oscillators[oscIndex]->SetFreq(this->ModulateFreq(OscBaseFrequency[oscIndex], modValue));
             }
@@ -181,7 +181,7 @@ namespace ByteFarm
                 Voice = voice;
             }
 
-            void SetBaseFreq(float freq) override
+            inline void SetBaseFreq(float freq) override
             {
                 for (uint8_t i = 0; i < 6; i++)
                 {
@@ -207,7 +207,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, 0.f);
                 float op2 = this->GetOscillatorValue(1);
@@ -231,7 +231,7 @@ namespace ByteFarm
                 return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -250,7 +250,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, op2Feedback);
                 float op2 = this->GetOscillatorValue(1);
@@ -274,7 +274,7 @@ namespace ByteFarm
                 return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -293,7 +293,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(2, 0.f);
@@ -318,7 +318,7 @@ namespace ByteFarm
                 return (op1 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[0]));
             }
@@ -337,7 +337,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(2, 0.f);
@@ -362,7 +362,7 @@ namespace ByteFarm
                 return (op1 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[0]));
             }
@@ -381,7 +381,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, 0.f);
                 float op2 = this->GetOscillatorValue(1);
@@ -405,7 +405,7 @@ namespace ByteFarm
                 return (op1 + op3 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[4]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -424,7 +424,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, 0.f);
                 float op2 = this->GetOscillatorValue(1);
@@ -448,7 +448,7 @@ namespace ByteFarm
                 return (op1 + op3 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[4]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -467,7 +467,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, 0.f);
                 float op2 = this->GetOscillatorValue(1);
@@ -491,7 +491,7 @@ namespace ByteFarm
                 return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -510,7 +510,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, 0.f);
                 float op2 = this->GetOscillatorValue(1);
@@ -534,7 +534,7 @@ namespace ByteFarm
                 return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -553,7 +553,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, op2Feedback);
                 float op2 = this->GetOscillatorValue(1);
@@ -577,7 +577,7 @@ namespace ByteFarm
                 return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -596,7 +596,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(2, op3Feedback);
@@ -621,7 +621,7 @@ namespace ByteFarm
                 return (op1 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[0]));
             }
@@ -640,7 +640,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(2, 0.f);
@@ -665,7 +665,7 @@ namespace ByteFarm
                 return (op1 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[0]));
             }
@@ -684,7 +684,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(1, op2Feedback);
@@ -709,7 +709,7 @@ namespace ByteFarm
                 return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -728,7 +728,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(1, 0.f);
@@ -753,7 +753,7 @@ namespace ByteFarm
                 return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -772,7 +772,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(1, 0.f);
@@ -797,7 +797,7 @@ namespace ByteFarm
                 return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -816,7 +816,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(1, op2Feedback);
@@ -841,7 +841,7 @@ namespace ByteFarm
                 return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
             }
@@ -860,7 +860,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(1, 0.f);
@@ -885,7 +885,7 @@ namespace ByteFarm
                 return (op1) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]));
             }
@@ -904,7 +904,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(1, op2Feedback);
@@ -929,7 +929,7 @@ namespace ByteFarm
                 return (op1) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]));
             }
@@ -948,7 +948,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(1, 0.f);
@@ -973,7 +973,7 @@ namespace ByteFarm
                 return (op1) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]));
             }
@@ -992,7 +992,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(2, 0.f);
@@ -1017,7 +1017,7 @@ namespace ByteFarm
                 return (op1 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
             }
@@ -1036,7 +1036,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(2, op3Feedback);
@@ -1061,7 +1061,7 @@ namespace ByteFarm
                 return (op1 + op2 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]));
             }
@@ -1080,7 +1080,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(2, op3Feedback);
@@ -1105,7 +1105,7 @@ namespace ByteFarm
                 return (op1 + op2 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
             }
@@ -1124,7 +1124,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(1, 0.f);
@@ -1149,7 +1149,7 @@ namespace ByteFarm
                 return (op1 + op3 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
             }
@@ -1168,7 +1168,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(0, 0.f);
@@ -1193,7 +1193,7 @@ namespace ByteFarm
                 return (op1 + op2 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
             }
@@ -1212,7 +1212,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(0, 0.f);
@@ -1237,7 +1237,7 @@ namespace ByteFarm
                 return (op1 + op2 + op3 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
             }
@@ -1256,7 +1256,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(0, 0.f);
@@ -1281,7 +1281,7 @@ namespace ByteFarm
                 return (op1 + op2 + op3 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
             }
@@ -1300,7 +1300,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(0, 0.f);
@@ -1325,7 +1325,7 @@ namespace ByteFarm
                 return (op1 + op2 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]));
             }
@@ -1344,7 +1344,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(0, 0.f);
@@ -1369,7 +1369,7 @@ namespace ByteFarm
                 return (op1 + op2 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]));
             }
@@ -1388,7 +1388,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(1, 0.f);
@@ -1398,6 +1398,7 @@ namespace ByteFarm
                 float op1 = this->GetOscillatorValue(0);
 
                 this->SetOscillatorFrequency(5, 0.f);
+
                 float op6 = this->GetOscillatorValue(5);
 
                 this->SetOscillatorFrequency(4, op5Feedback);
@@ -1413,7 +1414,7 @@ namespace ByteFarm
                 return (op1 + op3 + op6) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[5]));
             }
@@ -1432,7 +1433,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(0, 0.f);
@@ -1457,7 +1458,7 @@ namespace ByteFarm
                 return (op1 + op2 + op3 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[4]));
             }
@@ -1476,7 +1477,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(0, 0.f);
@@ -1501,7 +1502,7 @@ namespace ByteFarm
                 return (op1 + op2 + op3 + op6) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[5]));
             }
@@ -1520,7 +1521,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(0, 0.f);
@@ -1545,7 +1546,7 @@ namespace ByteFarm
                 return (op1 + op2 + op3 + +op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
             }
@@ -1564,7 +1565,7 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
-            float Generate() override
+            inline float Generate() override
             {
 
                 this->SetOscillatorFrequency(0, 0.f);
@@ -1589,7 +1590,7 @@ namespace ByteFarm
                 return (op1 + op2 + op3 + +op4 + op5 + op6) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
             }
 
-            void NormalizeVolume() override
+            inline void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]) + (this->Voice->OperatorLevel[5]));
             }

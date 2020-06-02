@@ -14,14 +14,14 @@ namespace ByteFarm
         class Geometry
         {
         public:
-            static XY Spirograph(float largeRadius, float smallRadius, float offset, float scale, float angle)
+            inline static XY Spirograph(float largeRadius, float smallRadius, float offset, float scale, float angle)
             {
                 float l = offset / smallRadius;
                 float k = smallRadius / largeRadius;
                 return Spirograph(k, l, scale, angle);
             }
 
-            static XY Spirograph(float R, float r, float scale, float angle)
+            inline static XY Spirograph(float R, float r, float scale, float angle)
             {
 
                 float oneMinusK = 1.f - R;

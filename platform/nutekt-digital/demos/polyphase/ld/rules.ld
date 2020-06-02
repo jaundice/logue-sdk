@@ -157,12 +157,14 @@ SECTIONS
     _usr_sdram_end = .;
   } > SDRAM
   
-  .heap : {
+  .heap : ALIGN(4) SUBALIGN(4){
+      . = ALIGN(4);
     __heap_start__ = .;
     end = __heap_start__;
     _end = end;
     __end = end;
     KEEP(*(.heap))
+    . = ALIGN(4);
     __heap_end__ = .;
     __HeapLimit = __heap_end__;
   } > SDRAM

@@ -43,7 +43,7 @@ namespace ByteFarm
 				_feedbackProcessors = feedbackProcessors;
 			}
 
-			void Increment() override
+			inline void Increment() override
 			{
 				_buffer.Increment();
 				for (int i = 0; i < _delayProcessors->Size(); i++)
@@ -56,7 +56,7 @@ namespace ByteFarm
 				}
 			}
 
-			LRSample32F Process(LRSample32F sample) override
+			inline LRSample32F Process(LRSample32F sample) override
 			{
 				LRSample32F s = sample.Clone();
 
@@ -82,7 +82,7 @@ namespace ByteFarm
 				return  (sample * (1.f - this->Params->Mix)) + (w * this->Params->Mix);
 			}
 
-			void SetBufferBlockSize(uint32_t blockSize){
+			inline void SetBufferBlockSize(uint32_t blockSize){
 				this->_buffer.SetBlockSize(blockSize);
 			}
 

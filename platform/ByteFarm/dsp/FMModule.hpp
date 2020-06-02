@@ -11,6 +11,34 @@ namespace ByteFarm
     namespace Dsp
     {
 
+        EnvelopeStage RandomEnvelope()
+        {
+            EnvelopeStage stages = Attack | Decay;
+
+            if (osc_white() > 0)
+            {
+                stages = stages | Delay;
+            }
+            if (osc_white() > 0)
+            {
+                stages = stages | Hold;
+            }
+            if (osc_white() > 0)
+            {
+                stages = stages | Sustain;
+            }
+            if (osc_white() > 0)
+            {
+                stages = stages | Release;
+            }
+            if (osc_white() > 0)
+            {
+                stages = stages | Loop;
+            }
+
+            return stages;
+        }
+
         template <uint8_t NumOscillators, uint16_t LUTSize, size_t SAMPLERATE>
         TypedArray<Voice *, 1, uint8_t> *GetVoices()
         {
@@ -21,12 +49,12 @@ namespace ByteFarm
             for (uint8_t i = 0; i < NumOscillators; i++)
             {
                 //Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>((Attack | Decay | Sustain | Release), 200.f, 3000.f * i, 2000.f, 500.f * i, 5000.f * i, 0.75f);
-                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(Delay | Attack | Hold | Decay | Sustain | Release, //envelope segments
-                                                                     0.f + 200.f * fabs(osc_white()),                   //delay
-                                                                     5.f + 2000.f * fabs(osc_white()),                  //attack
-                                                                     0.f + 400.f * fabs(osc_white()),                   //hold
-                                                                     2.f + 2000.f * fabs(osc_white()),                  //decay
-                                                                     2.f + 4000.f * fabs(osc_white()),                  //release
+                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(RandomEnvelope(), //envelope segments
+                                                                     0.f + 200.f * powf(osc_white(), 2),                //delay
+                                                                     6.f + 2000.f * powf(osc_white(), 2),               //attack
+                                                                     0.f + 400.f * powf(osc_white(), 2),                //hold
+                                                                     6.f + 2000.f * powf(osc_white(), 2),               //decay
+                                                                     6.f + 4000.f * powf(osc_white(), 2),               //release
                                                                      0.5f + 0.5f * osc_white(),                         //sustain level
                                                                      0.2f);                                             //slop
 
@@ -46,7 +74,7 @@ namespace ByteFarm
             {
             }
 
-            virtual void UpdateParams(uint16_t index, uint16_t value) override
+            inline virtual void UpdateParams(uint16_t index, uint16_t value) override
             {
 
                 FMVoice<NumOscillators, LUTSize, SAMPLERATE> *voice = (FMVoice<NumOscillators, LUTSize, SAMPLERATE> *)this->Voices->Get(0);
@@ -196,7 +224,7 @@ namespace ByteFarm
                 }
             };
 
-            virtual void UpdateOscParams(VoiceParams params) override
+            inline virtual void UpdateOscParams(VoiceParams params) override
             {
                 for (uint8_t i = 0; i < this->Voices->Size(); i++)
                 {

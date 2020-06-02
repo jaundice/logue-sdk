@@ -21,26 +21,26 @@ namespace ByteFarm
 			{
 			}
 
-			T Read(int32_t offset)
+			inline T Read(int32_t offset)
 			{
 				long idx = (_writeIndex + offset) % S;
 				return  this->Get(idx);
 			}
 
 
-			void Write(T value, int32_t subOffset = 0)
+			inline void Write(T value, int32_t subOffset = 0)
 			{
 				this->Set((_writeIndex + subOffset) % _blockSize, value);
 			}
 
-			void Increment()
+			inline void Increment()
 			{
 				//_writeIndex = (_writeIndex++ % S);
 				_writeIndex++;
 				_writeIndex%=_blockSize;
 			}
 
-			void SetBlockSize(long blockSize){
+			inline void SetBlockSize(long blockSize){
 				_blockSize = blockSize;
 			}
 		};

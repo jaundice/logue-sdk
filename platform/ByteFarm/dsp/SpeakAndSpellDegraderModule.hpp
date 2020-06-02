@@ -24,7 +24,7 @@ namespace ByteFarm
             {
             }
 
-            virtual void UpdateParams(uint8_t paramIndex, int32_t value) override
+            inline virtual void UpdateParams(uint8_t paramIndex, int32_t value) override
             {
                 float val = fabs(q31_to_f32(value));
 

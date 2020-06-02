@@ -19,7 +19,7 @@ namespace ByteFarm
                 Elements = elements;
             }
 
-            virtual void Process(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
+            inline virtual void Process(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames)
             {
                 const float *mx = main_xn;
                 float *__restrict my = main_yn;
@@ -52,7 +52,7 @@ namespace ByteFarm
                 }
             }
 
-            virtual void ProcessInPlace(float *main_xn, uint32_t frames)
+            inline virtual void ProcessInPlace(float *main_xn, uint32_t frames)
             {
                 float *mx = main_xn;
                 float *mx_e = mx + 2 * frames;

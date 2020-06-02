@@ -58,7 +58,7 @@ namespace ByteFarm
 				t = 0;
 			}
 
-			virtual LRSample32F Process(LRSample32F sample) override
+			inline virtual LRSample32F Process(LRSample32F sample) override
 			{
 
 				float l = ProcessSample(sample.Left);
@@ -76,7 +76,7 @@ namespace ByteFarm
 					invFB * r + invFB * sampleBufL[sidx] /* - sample.Right - (invFB * lfo * mono) */};
 			}
 
-			virtual void Increment() override
+			inline virtual void Increment() override
 			{
 				++t;
 				t %= SAMPLERATE;

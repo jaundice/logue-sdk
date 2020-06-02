@@ -84,7 +84,7 @@ namespace ByteFarm
             {
             }
 
-            virtual void UpdateParams(uint16_t index, uint16_t value) override
+            inline virtual void UpdateParams(uint16_t index, uint16_t value) override
             {
 
                 LUTVoice<16, 16, 1024, SAMPLERATE> *voice = (LUTVoice<16, 16, 1024, SAMPLERATE> *)this->Voices->Get(0);
@@ -133,7 +133,7 @@ namespace ByteFarm
                 }
             };
 
-            virtual void UpdateOscParams(VoiceParams params) override
+            inline virtual void UpdateOscParams(VoiceParams params) override
             {
                 for (uint8_t i = 0; i < this->Voices->Size(); i++)
                 {

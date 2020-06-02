@@ -15,7 +15,7 @@ namespace ByteFarm
 			volatile float Bits = 0;
 			volatile float Quantum;
 
-			void SetBits(float bits)
+			inline void SetBits(float bits)
 			{
 				Bits = bits;
 				Quantum = fastpowf(2.0f, bits);
@@ -42,7 +42,7 @@ namespace ByteFarm
 			{
 			}
 
-			LRSample32F Process(LRSample32F sample) override
+			inline LRSample32F Process(LRSample32F sample) override
 			{
 				// per sample
 				return LRSample32F{

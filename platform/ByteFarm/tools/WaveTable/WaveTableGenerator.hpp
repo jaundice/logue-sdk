@@ -20,13 +20,13 @@ namespace ByteFarm
         class CommonWaveTableFunctors
         {
         public:
-            static float Sine(float angle)
+            inline static float Sine(float angle)
             {
                 return sin(angle);
             }
 
             template <uint8_t partials>
-            static float Saw(float angle)
+            inline static float Saw(float angle)
             {
                 float res = 0;
                 for (int i = 1; i < partials + 1; i++)
@@ -37,7 +37,7 @@ namespace ByteFarm
             }
 
             template <uint8_t partials>
-            static float Tri(float angle)
+            inline static float Tri(float angle)
             {
                 float res = 0;
                 for (int i = 1; i < partials + 1; i++)
@@ -48,7 +48,7 @@ namespace ByteFarm
             }
 
             template <uint8_t partials>
-            static float Square(float angle)
+            inline static float Square(float angle)
             {
                 float res = 0;
                 for (int i = 1; i < partials + 1; i += 2)
@@ -64,7 +64,7 @@ namespace ByteFarm
 
         public:
             template <size_t arrSize>
-            static std::array<float, arrSize> Generate(Functor functor)
+            inline static std::array<float, arrSize> Generate(Functor functor)
             {
                 const float w = 2 * M_PI / arrSize;
                 std::array<float, arrSize> arr;
@@ -74,7 +74,7 @@ namespace ByteFarm
             }
 
             template <size_t arrSize>
-            static void Fill(float *arr, Functor functor)
+            inline static void Fill(float *arr, Functor functor)
             {
                 const float w = 2 * M_PI / arrSize;
 

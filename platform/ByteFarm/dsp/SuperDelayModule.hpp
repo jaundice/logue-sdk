@@ -57,7 +57,7 @@ namespace ByteFarm
             {
             }
 
-            virtual void UpdateParams(uint8_t paramIndex, int32_t value) override
+            inline virtual void UpdateParams(uint8_t paramIndex, int32_t value) override
             {
                 float val = fabs(q31_to_f32(value));
                 DelayBase<BufferSize, SampleRate, 1, 1> *dly = (DelayBase<BufferSize, SampleRate, 1, 1> *)this->Elements->Get(0);

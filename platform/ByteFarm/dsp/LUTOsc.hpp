@@ -24,18 +24,18 @@ namespace ByteFarm
                 Reset();
             }
 
-            void SetFreq(float freq)
+            inline void SetFreq(float freq)
             {
                 freq = freq;
                 stride = tl * freq;
             }
 
-            void Reset()
+            inline void Reset()
             {
                 index = startPhase * (float)LUTLength;
             }
 
-            float NextSample()
+            inline float NextSample()
             {
 
                 float idx = index;
@@ -65,7 +65,7 @@ namespace ByteFarm
                 return value;
             }
 
-            float Value(){
+            inline float Value(){
                 return value;
             }
         };

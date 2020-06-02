@@ -70,7 +70,7 @@ namespace ByteFarm
 		class SampleConvert
 		{
 		public:
-			static LRCSample32F ToLRC(LRSample32F sample)
+			inline static LRCSample32F ToLRC(LRSample32F sample)
 			{
 
 				float mid = 0.5 * (sample.Left + sample.Right);
@@ -81,7 +81,7 @@ namespace ByteFarm
 					mid};
 			}
 
-			static LRSample32F ToLR(LRCSample32F sample)
+			inline static LRSample32F ToLR(LRCSample32F sample)
 			{
 				return LRSample32F{
 					sample.Left + sample.Center,

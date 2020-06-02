@@ -174,7 +174,7 @@ namespace ByteFarm
                 Slop = slop;
             }
 
-            virtual void IncrementEnvelope(uint32_t frames) override
+            inline virtual void IncrementEnvelope(uint32_t frames) override
             {
                 for (uint8_t i = 0; i < NumEnvelopes; i++)
                 {
@@ -182,7 +182,7 @@ namespace ByteFarm
                 }
             };
 
-            virtual void Reset() override
+            inline virtual void Reset() override
             {
                 for (uint8_t i = 0; i < NumOscillators; i++)
                 {

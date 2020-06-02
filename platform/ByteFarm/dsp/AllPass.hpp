@@ -20,7 +20,7 @@ namespace ByteFarm
                 Reset();
             };
 
-            void Reset()
+            inline void Reset()
             {
 
                 *x0 = LRSample32F{0.f, 0.f};
@@ -108,7 +108,7 @@ namespace ByteFarm
                 // }
             };
 
-            LRSample32F Process(LRSample32F input)
+            inline LRSample32F Process(LRSample32F input)
             {
                 LRSample32F output = input;
                 for (uint8_t i = 0; i < NumFilters; i++)
@@ -144,7 +144,7 @@ namespace ByteFarm
             float *a_coefficients;
             float *b_coefficients;
 
-            static CascadedAllPassFilterParams *HalfBandFilter(HalfBandFilterOrder order, HalfBandFilterAngle angle)
+            inline static CascadedAllPassFilterParams *HalfBandFilter(HalfBandFilterOrder order, HalfBandFilterAngle angle)
             {
 
                 float *a;

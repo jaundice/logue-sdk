@@ -60,7 +60,7 @@ namespace ByteFarm
 			{
 			}
 
-			virtual void Process(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames) override
+			inline virtual void Process(const float *main_xn, float *main_yn, const float *sub_xn, float *sub_yn, uint32_t frames) override
 			{
 				const float *mx = main_xn;
 				float *__restrict my = main_yn;
@@ -88,7 +88,7 @@ namespace ByteFarm
 				}
 			}
 
-			virtual void UpdateParams(uint8_t paramIndex, int32_t value) override
+			inline virtual void UpdateParams(uint8_t paramIndex, int32_t value) override
 			{
 				float val = q31_to_f32(value);
 				switch (paramIndex)

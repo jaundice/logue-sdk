@@ -29,7 +29,7 @@ namespace ByteFarm
 			{
 			}
 
-			LRSample32F Process(LRSample32F input) override
+			inline LRSample32F Process(LRSample32F input) override
 			{
 				const LRSample32F delta = input - _last;
 				

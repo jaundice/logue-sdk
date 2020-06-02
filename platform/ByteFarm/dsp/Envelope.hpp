@@ -64,7 +64,7 @@ namespace ByteFarm
 
             bool NoteDown;
 
-            void TransitionStage()
+            inline void TransitionStage()
             {
                 switch (CurrentStage)
                 {
@@ -135,7 +135,7 @@ namespace ByteFarm
                 }
             }
 
-            void Calculate()
+            inline void Calculate()
             {
                 switch (CurrentStage)
                 {
@@ -178,13 +178,13 @@ namespace ByteFarm
 
             
 
-            float CurrentValue()
+            inline float CurrentValue()
             {
                 //return 1.f;
                 return Output;
             }
 
-            void Increment(uint32_t numFrames = 1)
+            inline void Increment(uint32_t numFrames = 1)
             {
 
                 switch (CurrentStage)
@@ -249,7 +249,7 @@ namespace ByteFarm
                 Calculate();
             }
 
-            void UpdateEnvelopeStage(EnvelopeStage stage, float milliseconds)
+            inline void UpdateEnvelopeStage(EnvelopeStage stage, float milliseconds)
             {
                 switch (stage)
                 {
@@ -302,7 +302,7 @@ namespace ByteFarm
                 ApplySlop();
             }
 
-            void ApplySlop()
+            inline void ApplySlop()
             {
                 DelayFrames = ModelDelayFrames + (uint32_t)(Slop * osc_white() * ModelDelayFrames);
                 AttackFrames = ModelAttackFrames + (uint32_t)(Slop * osc_white() * ModelAttackFrames);
@@ -311,14 +311,14 @@ namespace ByteFarm
                 ReleaseFrames = ModelReleaseFrames + (uint32_t)(Slop * osc_white() * ModelReleaseFrames);
             }
 
-            void Reset()
+            inline void Reset()
             {
                 ElapsedFrames = 0;
                 CurrentStage = Off;
                 NoteDown = false;
             }
 
-            void NoteOn()
+            inline void NoteOn()
             {
                 NoteDown = true;
                 //switch (this->CurrentStage)
@@ -331,11 +331,11 @@ namespace ByteFarm
                 //}
             }
 
-            void SetSlop(float slop){
+            inline void SetSlop(float slop){
                 Slop = slop;
             }
 
-            void NoteOff()
+            inline void NoteOff()
             {
                 NoteDown = false;
             }
