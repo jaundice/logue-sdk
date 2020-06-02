@@ -10,7 +10,7 @@
         "name" : "FM",
         "num_param" : 6,
         "params" : [
-            ["Tuning Slop",   0,  100,  "%"],
+            ["Algorithm",   0,  31,  "%"],
             ["Envelope Slop", 0,  100,  "%"],
             ["Fixed Amp Modulation", 0,  100,  "%"],
             ["Tuning",     -36, 36, "%"],

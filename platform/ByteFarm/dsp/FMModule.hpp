@@ -84,6 +84,78 @@ namespace ByteFarm
                     case 7:
                         voice->SetAlgorithm(7, new DX7Algo8<LUTSize, SAMPLERATE>(voice));
                         break;
+                    case 8:
+                        voice->SetAlgorithm(8, new DX7Algo9<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 9:
+                        voice->SetAlgorithm(9, new DX7Algo10<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 10:
+                        voice->SetAlgorithm(10, new DX7Algo11<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 11:
+                        voice->SetAlgorithm(11, new DX7Algo12<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 12:
+                        voice->SetAlgorithm(12, new DX7Algo13<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 13:
+                        voice->SetAlgorithm(13, new DX7Algo14<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 14:
+                        voice->SetAlgorithm(14, new DX7Algo15<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 15:
+                        voice->SetAlgorithm(15, new DX7Algo16<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 16:
+                        voice->SetAlgorithm(16, new DX7Algo17<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 17:
+                        voice->SetAlgorithm(17, new DX7Algo18<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 18:
+                        voice->SetAlgorithm(18, new DX7Algo19<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 19:
+                        voice->SetAlgorithm(19, new DX7Algo20<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 20:
+                        voice->SetAlgorithm(20, new DX7Algo21<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 21:
+                        voice->SetAlgorithm(21, new DX7Algo22<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 22:
+                        voice->SetAlgorithm(22, new DX7Algo23<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 23:
+                        voice->SetAlgorithm(23, new DX7Algo24<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 24:
+                        voice->SetAlgorithm(24, new DX7Algo25<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 25:
+                        voice->SetAlgorithm(25, new DX7Algo26<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 26:
+                        voice->SetAlgorithm(26, new DX7Algo27<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 27:
+                        voice->SetAlgorithm(27, new DX7Algo28<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 28:
+                        voice->SetAlgorithm(28, new DX7Algo29<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 29:
+                        voice->SetAlgorithm(29, new DX7Algo30<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 30:
+                        voice->SetAlgorithm(30, new DX7Algo31<LUTSize, SAMPLERATE>(voice));
+                        break;
+                    case 31:
+                        voice->SetAlgorithm(31, new DX7Algo32<LUTSize, SAMPLERATE>(voice));
+                        break;
                     }
                     break;
                 }

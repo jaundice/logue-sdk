@@ -43,7 +43,8 @@ namespace ByteFarm
 
             int8_t PitchOffset = 0;
 
-            uint8_t GetAlgorithmIndex(){
+            uint8_t GetAlgorithmIndex()
+            {
                 return this->AlgorithmIndex;
             }
 
@@ -73,7 +74,7 @@ namespace ByteFarm
 
             void SetAlgorithm(uint8_t index, FMAlgorithm<NumOscillators, LUTLength, SampleRate> *algo)
             {
-                if(this->Algorithm != nullptr)
+                if (this->Algorithm != nullptr)
                     delete this->Algorithm;
 
                 this->Algorithm = algo;
@@ -150,9 +151,8 @@ namespace ByteFarm
                 {
                     delete Envelopes[i];
                 }
-                
+
                 delete Algorithm;
-                
             }
         };
 
@@ -537,6 +537,1061 @@ namespace ByteFarm
             void NormalizeVolume() override
             {
                 this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo9 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op2Feedback = 0.f;
+
+        public:
+            DX7Algo9(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+                this->SetOscillatorFrequency(1, op2Feedback);
+                float op2 = this->GetOscillatorValue(1);
+                op2Feedback = op2;
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, 0.f);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(2, op4 + op5);
+                float op3 = this->GetOscillatorValue(2);
+
+                return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo10 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op3Feedback = 0.f;
+
+        public:
+            DX7Algo10(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(2, op3Feedback);
+                float op3 = this->GetOscillatorValue(2);
+                op3Feedback = op3;
+
+                this->SetOscillatorFrequency(1, op3);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6 + op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                return (op1 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo11 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo11(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(2, 0.f);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(1, op3);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6 + op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                return (op1 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo12 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op2Feedback = 0.f;
+
+        public:
+            DX7Algo12(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(1, op2Feedback);
+                float op2 = this->GetOscillatorValue(1);
+                op2Feedback = op2;
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(3, 0.f);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(2, op4 + op5 + op6);
+                float op3 = this->GetOscillatorValue(2);
+
+                return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo13 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo13(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(3, 0.f);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(2, op4 + op5 + op6);
+                float op3 = this->GetOscillatorValue(2);
+
+                return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo14 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo14(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6 + op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(2, op4);
+                float op3 = this->GetOscillatorValue(2);
+
+                return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo15 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op2Feedback = 0.f;
+
+        public:
+            DX7Algo15(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(1, op2Feedback);
+                float op2 = this->GetOscillatorValue(1);
+                op2Feedback = op2;
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6 + op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(2, op4);
+                float op3 = this->GetOscillatorValue(2);
+
+                return (op1 + op3) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo16 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo16(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(3, 0.f);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(2, op4);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(0, op2 + op3 + op5);
+                float op1 = this->GetOscillatorValue(0);
+
+                return (op1) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo17 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op2Feedback = 0.f;
+
+        public:
+            DX7Algo17(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(1, op2Feedback);
+                float op2 = this->GetOscillatorValue(1);
+                op2Feedback = op2;
+
+                this->SetOscillatorFrequency(3, 0.f);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(2, op4);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(0, op2 + op3 + op5);
+                float op1 = this->GetOscillatorValue(0);
+
+                return (op1) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo18 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op3Feedback = 0.f;
+
+        public:
+            DX7Algo18(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(2, op3Feedback);
+                float op3 = this->GetOscillatorValue(2);
+                op3Feedback = op3;
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(0, op2 + op3 + op5);
+                float op1 = this->GetOscillatorValue(0);
+
+                return (op1) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo19 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo19(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(2, 0.f);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6);
+                float op4 = this->GetOscillatorValue(3);
+
+                return (op1 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo20 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op3Feedback = 0.f;
+
+        public:
+            DX7Algo20(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(2, op3Feedback);
+                float op3 = this->GetOscillatorValue(2);
+                op3Feedback = op3;
+
+                this->SetOscillatorFrequency(1, op3);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(0, op3);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6 + op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                return (op1 + op2 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo21 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op3Feedback = 0.f;
+
+        public:
+            DX7Algo21(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(2, op3Feedback);
+                float op3 = this->GetOscillatorValue(2);
+                op3Feedback = op3;
+
+                this->SetOscillatorFrequency(1, op3);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(0, op3);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6);
+                float op4 = this->GetOscillatorValue(3);
+
+                return (op1 + op2 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo22 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo22(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(2, op6);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6);
+                float op4 = this->GetOscillatorValue(3);
+
+                return (op1 + op3 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo23 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo23(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(0, 0.f);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(2, 0.f);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(1, op3);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6);
+                float op4 = this->GetOscillatorValue(3);
+
+                return (op1 + op2 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo24 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo24(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(0, 0.f);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(2, op6);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(3, op6);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                return (op1 + op2 + op3 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo25 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo25(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(0, 0.f);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(2, 0.f);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(3, op6);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                return (op1 + op2 + op3 + op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo26 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo26(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(0, 0.f);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(2, 0.f);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(1, op3);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6 + op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                return (op1 + op2 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo27 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op3Feedback = 0.f;
+
+        public:
+            DX7Algo27(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(0, 0.f);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(2, op3Feedback);
+                float op3 = this->GetOscillatorValue(2);
+                op3Feedback = op3;
+
+                this->SetOscillatorFrequency(1, op3);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(3, op6 + op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                return (op1 + op2 + op4) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[3]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo28 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op5Feedback = 0.f;
+
+        public:
+            DX7Algo28(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(0, op2);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                this->SetOscillatorFrequency(4, op5Feedback);
+                float op5 = this->GetOscillatorValue(4);
+                op5Feedback = op5;
+
+                this->SetOscillatorFrequency(3, op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(2, op4);
+                float op3 = this->GetOscillatorValue(2);
+
+                return (op1 + op3 + op6) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[5]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo29 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo29(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(0, 0.f);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(3, 0.f);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(2, op4);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                return (op1 + op2 + op3 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[4]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo30 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op5Feedback = 0.f;
+
+        public:
+            DX7Algo30(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(0, 0.f);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(4, op5Feedback);
+                float op5 = this->GetOscillatorValue(4);
+                op5Feedback = op5;
+
+                this->SetOscillatorFrequency(3, op5);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(2, op4);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(5, 0.f);
+                float op6 = this->GetOscillatorValue(5);
+
+                return (op1 + op2 + op3 + op6) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[5]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo31 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo31(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(0, 0.f);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(2, 0.f);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(3, 0.f);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                this->SetOscillatorFrequency(4, op6);
+                float op5 = this->GetOscillatorValue(4);
+
+                return (op1 + op2 + op3 + +op4 + op5) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]));
+            }
+        };
+
+        template <size_t LUTLength, size_t SampleRate>
+        class DX7Algo32 : public DX7Algo<LUTLength, SampleRate>
+        {
+
+            float op6Feedback = 0.f;
+
+        public:
+            DX7Algo32(FMVoice<6, LUTLength, SampleRate> *voice)
+                : DX7Algo<LUTLength, SampleRate>(voice)
+            {
+                this->NormalizeVolume();
+            }
+
+            float Generate() override
+            {
+
+                this->SetOscillatorFrequency(0, 0.f);
+                float op1 = this->GetOscillatorValue(0);
+
+                this->SetOscillatorFrequency(1, 0.f);
+                float op2 = this->GetOscillatorValue(1);
+
+                this->SetOscillatorFrequency(2, 0.f);
+                float op3 = this->GetOscillatorValue(2);
+
+                this->SetOscillatorFrequency(3, 0.f);
+                float op4 = this->GetOscillatorValue(3);
+
+                this->SetOscillatorFrequency(4, 0.f);
+                float op5 = this->GetOscillatorValue(4);
+
+                this->SetOscillatorFrequency(5, op6Feedback);
+                float op6 = this->GetOscillatorValue(5);
+                op6Feedback = op6;
+
+                return (op1 + op2 + op3 + +op4 + op5 + op6) * this->Voice->Envelopes[6]->CurrentValue() * this->Normalize;
+            }
+
+            void NormalizeVolume() override
+            {
+                this->Normalize = 1.f / ((this->Voice->OperatorLevel[0]) + (this->Voice->OperatorLevel[1]) + (this->Voice->OperatorLevel[2]) + (this->Voice->OperatorLevel[3]) + (this->Voice->OperatorLevel[4]) + (this->Voice->OperatorLevel[5]));
             }
         };
 
