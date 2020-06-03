@@ -11,9 +11,14 @@ namespace ByteFarm
     namespace Dsp
     {
 
-        inline EnvelopeStage RandomEnvelope()
+        float DX100Ratios[64]{0.50f, 0.71f, 0.78f, 0.87f, 1.00f, 1.41f, 1.57f, 1.73f, 2.00f, 2.82f, 3.00f, 3.14f, 3.46f, 4.00f, 4.24f, 4.71f, 5.00f, 5.19f, 5.65f, 6.00f, 6.28f, 6.92f, 7.00f, 7.07f, 7.85f, 8.00f, 8.48f, 8.65f, 9.00f, 9.42f, 9.89f, 10.00f, 10.38f, 10.99f, 11.00f, 11.30f, 12.00f, 12.11f, 12.56f, 12.72f, 13.00f, 13.84f, 14.00f, 14.10f, 14.13f, 15.00f, 15.55f, 15.57f, 15.70f, 16.96f, 17.27f, 17.30f, 18.37f, 18.84f, 19.03f, 19.78f, 20.41f, 20.76f, 21.20f, 21.98f, 22.49f, 23.55f, 24.22f, 25.95f};
+
+        inline EnvelopeStage RandomEnvelope(bool crossFade)
         {
-            EnvelopeStage stages = Attack | Decay;
+            EnvelopeStage stages = Attack | Decay | Release;
+
+            if (crossFade)
+                stages = stages | Crossfade;
 
             if (osc_white() > 0)
             {
@@ -26,10 +31,6 @@ namespace ByteFarm
             if (osc_white() > 0)
             {
                 stages = stages | Sustain;
-            }
-            if (osc_white() > 0)
-            {
-                stages = stages | Release;
             }
             if (osc_white() > 0)
             {
@@ -46,22 +47,22 @@ namespace ByteFarm
 
             FMVoice<NumOscillators, LUTSize, SAMPLERATE> *v = new FMVoice<NumOscillators, LUTSize, SAMPLERATE>();
 
-            for (uint8_t i = 0; i < NumOscillators; i++)
+            for (uint8_t i = 0; i < NumOscillators + 1; i++)
             {
                 //Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>((Attack | Decay | Sustain | Release), 200.f, 3000.f * i, 2000.f, 500.f * i, 5000.f * i, 0.75f);
-                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(RandomEnvelope(),                    //envelope segments
-                                                                     0.f + 200.f * powf(osc_white(), 2),  //delay
-                                                                     6.f + 2000.f * powf(osc_white(), 2), //attack
-                                                                     0.f + 400.f * powf(osc_white(), 2),  //hold
-                                                                     6.f + 2000.f * powf(osc_white(), 2), //decay
-                                                                     6.f + 4000.f * powf(osc_white(), 2), //release
-                                                                     0.5f + 0.5f * osc_white(),           //sustain level
-                                                                     0.2f);                               //slop
+                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(RandomEnvelope(false),            //envelope segments
+                                                                     0.f + 200.f * fabs(osc_white()),  //delay
+                                                                     1.f + 2000.f * fabs(osc_white()), //attack
+                                                                     0.f + 2000.f * fabs(osc_white()), //hold
+                                                                     1.f + 2000.f * fabs(osc_white()), //decay
+                                                                     1.f + 2000.f * fabs(osc_white()), //release
+                                                                     0.5f + 0.5f * osc_white(),        //sustain level
+                                                                     0.2f);                            //slop
 
                 v->Envelopes[i] = env;
             }
 
-            v->Modulate = osc_white() < 1 ? ModulateFreqAndAdd : ModulateFreq;
+            v->Modulate = osc_white() < 1.f ? ModulateFreqAndAdd : ModulateFreq;
 
             voices->Set(0, v);
             return voices;
@@ -85,10 +86,45 @@ namespace ByteFarm
                 {
                 case k_user_osc_param_id1:
                 {
-                    if (value == voice->GetAlgorithmIndex())
+
+                    //voice->Modulate = ModulateFreqAndAdd;
+                    break;
+                }
+                case k_user_osc_param_id2:
+                {
+                    for (uint8_t i = 0; i < NumOscillators + 1; i++)
+                    {
+                        voice->GetEnvelope(i)->SetSlop(param_val_to_f32(value) * 0.5f + 0.5f);
+                    }
+                    break;
+                }
+                case k_user_osc_param_id3:
+                {
+                    voice->SetModulator(value == 0 ? ModulateFreqAndAdd : ModulateFreq);
+                    break;
+                }
+                case k_user_osc_param_id4:
+                {
+                    voice->PitchOffset = value - 100;
+                    break;
+                }
+                case k_user_osc_param_id5:
+                {
+                    voice->ResetOscillatorsOnNoteOn = value == 0 ? false : true;
+                    break;
+                }
+                case k_user_osc_param_id6:
+                {
+                    break;
+                }
+                case k_user_osc_param_shape:
+                {
+                    uint16_t algo = (uint16_t)fminf(floorf((32.f) * (float)value / (float)1023), 31);
+
+                    if (algo == voice->GetAlgorithmIndex())
                         break;
 
-                    switch (value)
+                    switch (algo)
                     {
                     case 0:
                         voice->SetAlgorithm(0, new DX7Algo1<LUTSize, SAMPLERATE>(voice));
@@ -187,38 +223,7 @@ namespace ByteFarm
                         voice->SetAlgorithm(31, new DX7Algo32<LUTSize, SAMPLERATE>(voice));
                         break;
                     }
-                    //voice->Modulate = ModulateFreqAndAdd;
-                    break;
-                }
-                case k_user_osc_param_id2:
-                {
-                    for (uint8_t i = 0; i < NumOscillators + 1; i++)
-                    {
-                        voice->GetEnvelope(i)->SetSlop(param_val_to_f32(value) * 0.5f + 0.5f);
-                    }
-                    break;
-                }
-                case k_user_osc_param_id3:
-                {
-                    voice->SetModulator(value == 0 ? ModulateFreqAndAdd : ModulateFreq);
-                    break;
-                }
-                case k_user_osc_param_id4:
-                {
-                    voice->PitchOffset = value - 100;
-                    break;
-                }
-                case k_user_osc_param_id5:
-                {
-                     voice->ResetOscillatorsOnNoteOn = value == 0 ? false : true;
-                    break;
-                }
-                case k_user_osc_param_id6:
-                {
-                    break;
-                }
-                case k_user_osc_param_shape:
-                {
+
                     break;
                 }
                 case k_user_osc_param_shiftshape:
@@ -252,6 +257,27 @@ namespace ByteFarm
                 }
 
                 fmv->SetAlgorithm(0, new DX7Algo1<LUTSize, SAMPLERATE>(fmv));
+                fmv->SetModulator(ModulateFreqAndAdd);
+            }
+        };
+
+        template <size_t SAMPLERATE, size_t LUTSize>
+        class DX100Module : public FMModule<6, SAMPLERATE, LUTSize>
+        {
+        public:
+            DX100Module() : FMModule<6, SAMPLERATE, LUTSize>()
+            {
+                FMVoice<6, LUTSize, SAMPLERATE> *fmv = (FMVoice<6, LUTSize, SAMPLERATE> *)this->Voices->Get(0);
+
+                for (uint8_t i = 0; i < 6; i++)
+                {
+                    fmv->OscRatio[i] = DX100Ratios[(uint8_t)floorf(64.f * osc_white())];
+                    fmv->OperatorLevel[i] = 1.f * osc_white(); //- 0.1f / (float)i;
+                }
+
+                fmv->SetAlgorithm(0, new DX7Algo1<LUTSize, SAMPLERATE>(fmv));
+                fmv->SetModulator(ModulateFreqAndAdd);
+                //fmv->ResetOscillators();
             }
         };
 

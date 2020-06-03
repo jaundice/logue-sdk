@@ -19,7 +19,7 @@ namespace ByteFarm
         }
         inline float ModulateFreq(float freq, float modValue)
         {
-            return modValue * freq;
+            return fabs(modValue * freq);
         }
 
         template <uint8_t NumOscillators, size_t LUTLength, size_t SampleRate>
@@ -102,11 +102,15 @@ namespace ByteFarm
 
             inline void SetAlgorithm(uint8_t index, FMAlgorithm<NumOscillators, LUTLength, SampleRate> *algo)
             {
-                if (this->Algorithm != nullptr)
-                    delete this->Algorithm;
+
+                auto curr = this->Algorithm;
 
                 this->Algorithm = algo;
                 this->AlgorithmIndex = index;
+
+                if (curr != nullptr)
+                    delete curr;
+
                 // if (ResetOscillatorsOnNoteOn)
                 //     this->ResetOscillators();
             }

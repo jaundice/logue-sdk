@@ -59,7 +59,7 @@ namespace ByteFarm
             for (uint8_t i = 0; i < NumEnvelopes; i++)
             {
                 //Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>((Attack | Decay | Sustain | Release), 200.f, 3000.f * i, 2000.f, 500.f * i, 5000.f * i, 0.75f);
-                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(Delay | Attack | Hold | Decay | Sustain | Release | Loop, //envelope segments
+                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(Delay | Attack | Hold | Decay | Sustain | Release | Loop | Crossfade, //envelope segments
                                                                      1.f + 3.f * fabs(osc_white()),                     //delay
                                                                      2.f + 50.f * fabs(osc_white()),                    //attack
                                                                      200.f + 400.f * fabs(osc_white()),                 //hold

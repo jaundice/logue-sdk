@@ -42,3 +42,7 @@ cd ../
 cd FM
 make clean
 make
+cd ../
+cd DX
+make clean
+make
