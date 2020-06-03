@@ -50,7 +50,7 @@ namespace ByteFarm
             float Slop = 0.1f;
             float CrossfadeLevel = 0.f;
 
-            float OneOverCrossfadeFrames = 1.f / (float)FramesPerMs;
+            float OneOverCrossfadeFrames = 4.f / (float)FramesPerMs;
             uint32_t CrossfadeElapsed = 0;
 
             uint32_t ModelDelayFrames = 0;

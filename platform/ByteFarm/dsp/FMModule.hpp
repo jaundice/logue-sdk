@@ -50,14 +50,14 @@ namespace ByteFarm
             for (uint8_t i = 0; i < NumOscillators + 1; i++)
             {
                 //Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>((Attack | Decay | Sustain | Release), 200.f, 3000.f * i, 2000.f, 500.f * i, 5000.f * i, 0.75f);
-                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(RandomEnvelope(false),            //envelope segments
-                                                                     0.f + 200.f * fabs(osc_white()),  //delay
-                                                                     1.f + 2000.f * fabs(osc_white()), //attack
-                                                                     0.f + 2000.f * fabs(osc_white()), //hold
-                                                                     1.f + 2000.f * fabs(osc_white()), //decay
-                                                                     1.f + 2000.f * fabs(osc_white()), //release
-                                                                     0.5f + 0.5f * osc_white(),        //sustain level
-                                                                     0.2f);                            //slop
+                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(RandomEnvelope(i == NumOscillators),   //envelope segments
+                                                                     0.f + 200.f * powf(osc_white(), 2.f),  //delay
+                                                                     1.f + 2000.f * powf(osc_white(), 2.f), //attack
+                                                                     0.f + 2000.f * powf(osc_white(), 2.f), //hold
+                                                                     1.f + 2000.f * powf(osc_white(), 2.f), //decay
+                                                                     1.f + 2000.f * powf(osc_white(), 2.f), //release
+                                                                     0.5f + 0.5f * osc_white(),             //sustain level
+                                                                     0.2f);                                 //slop
 
                 v->Envelopes[i] = env;
             }
