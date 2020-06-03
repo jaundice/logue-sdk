@@ -12,9 +12,9 @@
         "params" : [
             ["Algorithm",   0,  31,  "%"],
             ["Envelope Slop", 0,  100,  "%"],
-            ["Fixed Amp Modulation", 0,  100,  "%"],
+            ["Modulator", 0,  1,  "%"],
             ["Tuning",     -36, 36, "%"],
-            ["TODO",    0, 100, "%"],
+            ["Reset Oscillators",    0, 1, "%"],
             ["TODO",   0, 100, "%"]
           ]
     }

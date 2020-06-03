@@ -57,7 +57,7 @@ namespace ByteFarm
 			inline void SetFilterMode(FilterMode mode) { Mode = mode; }
 
 		private:
-			void CalculateFeedbackAmount() { FeedbackAmount = Resonance + Resonance / (1.0f - Cutoff); }
+			inline void CalculateFeedbackAmount() { FeedbackAmount = Resonance + Resonance / (1.0f - Cutoff); }
 		};
 		
 		template<size_t SAMPLERATE>
@@ -73,7 +73,7 @@ namespace ByteFarm
 				buf3 = {0, 0};
 			};
 
-			LRSample32F Process(LRSample32F sample) override
+			inline LRSample32F Process(LRSample32F sample) override
 			{
 				buf0 = buf0 + ((sample - buf0) * this->Params->Cutoff);
 				buf1 = buf1 + ((buf0 - buf1) * this->Params->Cutoff);

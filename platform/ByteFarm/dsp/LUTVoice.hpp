@@ -30,12 +30,12 @@ namespace ByteFarm
                 SemiTones = semiTones;
             }
 
-            void SetSemis(int16_t semis) override
+            inline void SetSemis(int16_t semis) override
             {
                 SemiTones = semis;
             }
 
-            int16_t GetOscillatorNote(uint8_t oscillatorIndex, int16_t note) override
+            inline int16_t GetOscillatorNote(uint8_t oscillatorIndex, int16_t note) override
             {
 
                 note += SemiTones;
@@ -60,12 +60,12 @@ namespace ByteFarm
             int16_t SemiTones;
 
         public:
-            void SetSemis(int16_t semis) override
+            inline void SetSemis(int16_t semis) override
             {
                 SemiTones = semis;
             }
 
-            OctavesTuningModifier(int16_t semiTones)
+            inline OctavesTuningModifier(int16_t semiTones)
             {
                 SemiTones = semiTones;
 
@@ -75,7 +75,7 @@ namespace ByteFarm
                 }
             }
 
-            int16_t GetOscillatorNote(uint8_t oscillatorIndex, int16_t note) override
+            inline int16_t GetOscillatorNote(uint8_t oscillatorIndex, int16_t note) override
             {
                 note += Modifier[oscillatorIndex];
                 note += SemiTones;
@@ -118,12 +118,12 @@ namespace ByteFarm
                 }
             }
 
-            float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 0.f) override
+            inline float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 0.f) override
             {
                 return Sin[((int16_t)(modulator * 100.f) + (int16_t)((float)oscillatorIndex * Offset)) % 100] * 0.5f + 0.5f;
             }
 
-            float GetOverallAmplitude() override
+            inline float GetOverallAmplitude() override
             {
                 return 1.f;
             }
@@ -135,12 +135,12 @@ namespace ByteFarm
             float OverallAmp = 1.f / (float)NumOscillators;
 
         public:
-            float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 0.f) override
+            inline float GetOscillatorAmplitude(uint8_t oscillatorIndex, float modulator = 0.f) override
             {
                 return 1.f;
             }
 
-            float GetOverallAmplitude() override
+            inline float GetOverallAmplitude() override
             {
                 return OverallAmp;
             }
@@ -169,7 +169,7 @@ namespace ByteFarm
                 TuningModifier = tuningModifier;
             }
 
-            void SetSlop(float slop)
+            inline void SetSlop(float slop)
             {
                 Slop = slop;
             }

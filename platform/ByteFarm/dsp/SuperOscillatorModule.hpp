@@ -98,7 +98,7 @@ namespace ByteFarm
                 }
                 case k_user_osc_param_id2:
                 {
-                    for (uint8_t i = 0; i < voice->Envelopes.Size(); i++)
+                    for (uint8_t i = 0; i < NumEnvelopes; i++)
                     {
                         voice->Envelopes.Get(i)->SetSlop(param_val_to_f32(value) * 0.5f + 0.5f);
                     }

@@ -9,13 +9,13 @@ namespace ByteFarm
     {
 
         template <class T>
-        void Delete(T item)
+        inline void Delete(T item)
         {
             //do nothing
         }
 
         template <class T>
-        void Delete(T *item)
+        inline void Delete(T *item)
         {
             delete item;
         }

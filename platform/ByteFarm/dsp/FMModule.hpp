@@ -11,7 +11,7 @@ namespace ByteFarm
     namespace Dsp
     {
 
-        EnvelopeStage RandomEnvelope()
+        inline EnvelopeStage RandomEnvelope()
         {
             EnvelopeStage stages = Attack | Decay;
 
@@ -49,17 +49,19 @@ namespace ByteFarm
             for (uint8_t i = 0; i < NumOscillators; i++)
             {
                 //Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>((Attack | Decay | Sustain | Release), 200.f, 3000.f * i, 2000.f, 500.f * i, 5000.f * i, 0.75f);
-                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(RandomEnvelope(), //envelope segments
-                                                                     0.f + 200.f * powf(osc_white(), 2),                //delay
-                                                                     6.f + 2000.f * powf(osc_white(), 2),               //attack
-                                                                     0.f + 400.f * powf(osc_white(), 2),                //hold
-                                                                     6.f + 2000.f * powf(osc_white(), 2),               //decay
-                                                                     6.f + 4000.f * powf(osc_white(), 2),               //release
-                                                                     0.5f + 0.5f * osc_white(),                         //sustain level
-                                                                     0.2f);                                             //slop
+                Envelope<SAMPLERATE> *env = new Envelope<SAMPLERATE>(RandomEnvelope(),                    //envelope segments
+                                                                     0.f + 200.f * powf(osc_white(), 2),  //delay
+                                                                     6.f + 2000.f * powf(osc_white(), 2), //attack
+                                                                     0.f + 400.f * powf(osc_white(), 2),  //hold
+                                                                     6.f + 2000.f * powf(osc_white(), 2), //decay
+                                                                     6.f + 4000.f * powf(osc_white(), 2), //release
+                                                                     0.5f + 0.5f * osc_white(),           //sustain level
+                                                                     0.2f);                               //slop
 
                 v->Envelopes[i] = env;
             }
+
+            v->Modulate = osc_white() < 1 ? ModulateFreqAndAdd : ModulateFreq;
 
             voices->Set(0, v);
             return voices;
@@ -185,6 +187,7 @@ namespace ByteFarm
                         voice->SetAlgorithm(31, new DX7Algo32<LUTSize, SAMPLERATE>(voice));
                         break;
                     }
+                    //voice->Modulate = ModulateFreqAndAdd;
                     break;
                 }
                 case k_user_osc_param_id2:
@@ -197,7 +200,7 @@ namespace ByteFarm
                 }
                 case k_user_osc_param_id3:
                 {
-                    //voice->AmpModulator = param_val_to_f32(value) * 0.5f + 0.5f;
+                    voice->SetModulator(value == 0 ? ModulateFreqAndAdd : ModulateFreq);
                     break;
                 }
                 case k_user_osc_param_id4:
@@ -207,6 +210,7 @@ namespace ByteFarm
                 }
                 case k_user_osc_param_id5:
                 {
+                     voice->ResetOscillatorsOnNoteOn = value == 0 ? false : true;
                     break;
                 }
                 case k_user_osc_param_id6:

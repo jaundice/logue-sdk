@@ -11,6 +11,17 @@ namespace ByteFarm
     namespace Dsp
     {
 
+        typedef float (*Modulator)(float freq, float modValue);
+
+        inline float ModulateFreqAndAdd(float freq, float modValue)
+        {
+            return freq + modValue * freq;
+        }
+        inline float ModulateFreq(float freq, float modValue)
+        {
+            return modValue * freq;
+        }
+
         template <uint8_t NumOscillators, size_t LUTLength, size_t SampleRate>
         class FMAlgorithm
         {
@@ -20,12 +31,9 @@ namespace ByteFarm
 
             virtual void SetBaseFreq(float freq) = 0;
 
-            virtual void NormalizeVolume();
+            virtual void NormalizeVolume() = 0;
 
-            inline virtual float ModulateFreq(float freq, float modValue)
-            {
-                return freq + modValue * freq;
-            }
+            virtual void Reset(float initFeedback) = 0;
         };
 
         template <uint8_t NumOscillators, size_t LUTLength, size_t SampleRate>
@@ -42,6 +50,26 @@ namespace ByteFarm
             float OperatorLevel[NumOscillators]{1.f};
 
             int8_t PitchOffset = 0;
+            Modulator Modulate = ModulateFreqAndAdd;
+
+            bool ResetOscillatorsOnNoteOn = false;
+
+            inline void SetModulator(Modulator mod)
+            {
+                this->Modulate = mod;
+                // if (ResetOscillatorsOnNoteOn)
+                //     this->ResetOscillators();
+            }
+
+            inline void ResetOscillators()
+            {
+                for (uint8_t i = 0; i < NumOscillators; i++)
+                {
+                    this->Oscillators[i]->Reset();
+                }
+                if (this->Algorithm != nullptr)
+                    this->Algorithm->Reset((Modulator)(this->Algorithm) == (Modulator)ModulateFreqAndAdd ? 0.f : 1.f);
+            }
 
             inline uint8_t GetAlgorithmIndex()
             {
@@ -79,6 +107,8 @@ namespace ByteFarm
 
                 this->Algorithm = algo;
                 this->AlgorithmIndex = index;
+                // if (ResetOscillatorsOnNoteOn)
+                //     this->ResetOscillators();
             }
 
             inline void SetRate(uint8_t oscIndex, float rate)
@@ -97,6 +127,11 @@ namespace ByteFarm
 
             inline virtual void NoteOn() override
             {
+                if (ResetOscillatorsOnNoteOn)
+                {
+                    this->ResetOscillators();
+                }
+
                 for (uint8_t i = 0; i < NumOscillators + 1; i++)
                 {
                     this->Envelopes[i]->NoteOn();
@@ -133,11 +168,11 @@ namespace ByteFarm
                 return Envelopes[envIdx];
             }
 
-            void IncrementEnvelope(uint32_t frames) override
+            inline void IncrementEnvelope(uint32_t frames) override
             {
             }
 
-            void Reset() override
+            inline void Reset() override
             {
             }
 
@@ -172,7 +207,7 @@ namespace ByteFarm
 
             inline void SetOscillatorFrequency(uint8_t oscIndex, float modValue)
             {
-                this->Voice->Oscillators[oscIndex]->SetFreq(this->ModulateFreq(OscBaseFrequency[oscIndex], modValue));
+                this->Voice->Oscillators[oscIndex]->SetFreq(this->Voice->Modulate(OscBaseFrequency[oscIndex], modValue));
             }
 
         public:
@@ -205,6 +240,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -250,6 +290,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op2Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, op2Feedback);
@@ -291,6 +336,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -337,6 +387,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op4Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
 
@@ -379,6 +434,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -424,6 +484,10 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op5Feedback = initFeedback;
+            }
             inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, 0.f);
@@ -465,6 +529,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -510,6 +579,10 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op4Feedback = initFeedback;
+            }
             inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, 0.f);
@@ -553,6 +626,10 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op2Feedback = initFeedback;
+            }
             inline float Generate() override
             {
                 this->SetOscillatorFrequency(1, op2Feedback);
@@ -596,6 +673,10 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op3Feedback = initFeedback;
+            }
             inline float Generate() override
             {
 
@@ -638,6 +719,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -684,6 +770,10 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op2Feedback = initFeedback;
+            }
             inline float Generate() override
             {
 
@@ -726,6 +816,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -772,6 +867,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
 
@@ -816,6 +916,10 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op2Feedback = initFeedback;
+            }
             inline float Generate() override
             {
 
@@ -858,6 +962,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -904,6 +1013,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op2Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
 
@@ -946,6 +1060,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op3Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -992,6 +1111,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
 
@@ -1036,6 +1160,10 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op3Feedback = initFeedback;
+            }
             inline float Generate() override
             {
 
@@ -1078,6 +1206,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op3Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -1124,6 +1257,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
 
@@ -1166,6 +1304,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -1212,6 +1355,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
 
@@ -1254,6 +1402,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -1300,6 +1453,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
 
@@ -1344,6 +1502,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op3Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
 
@@ -1386,6 +1549,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op5Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -1433,6 +1601,11 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
+            }
+
             inline float Generate() override
             {
 
@@ -1475,6 +1648,11 @@ namespace ByteFarm
                 : DX7Algo<LUTLength, SampleRate>(voice)
             {
                 this->NormalizeVolume();
+            }
+
+            inline void Reset(float initFeedback) override
+            {
+                op5Feedback = initFeedback;
             }
 
             inline float Generate() override
@@ -1521,6 +1699,10 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
+            }
             inline float Generate() override
             {
 
@@ -1565,6 +1747,10 @@ namespace ByteFarm
                 this->NormalizeVolume();
             }
 
+            inline void Reset(float initFeedback) override
+            {
+                op6Feedback = initFeedback;
+            }
             inline float Generate() override
             {
 

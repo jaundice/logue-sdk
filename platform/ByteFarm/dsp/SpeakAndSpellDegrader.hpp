@@ -30,12 +30,12 @@ namespace ByteFarm
 			{
 			}
 
-			void Increment() override
+			inline void Increment() override
 			{
 				step = (++step % this->GetSandSParams()->Downsample);
 			}
 
-			LRSample32F Process(LRSample32F sample) override
+			inline LRSample32F Process(LRSample32F sample) override
 			{
 				if (step > 0)
 					return _sample;
@@ -44,7 +44,7 @@ namespace ByteFarm
 
 				return _sample;
 			}
-			SpeakAndSpellDegraderParams *GetSandSParams()
+			inline SpeakAndSpellDegraderParams *GetSandSParams()
 			{
 				return static_cast<SpeakAndSpellDegraderParams *>(this->Params);
 			}

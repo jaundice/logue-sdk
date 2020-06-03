@@ -8,34 +8,34 @@ namespace ByteFarm
 			float Left;
 			float Right;
 
-			LRSample32F Clone() const
+			inline LRSample32F Clone() const
 			{
 				return LRSample32F{Left, Right};
 			}
 
-			LRSample32F MonoSum() const
+			inline LRSample32F MonoSum() const
 			{
 				float s = (Left + Right) * 0.5f;
 
 				return LRSample32F{s, s};
 			}
 
-			LRSample32F operator*(float factor) const
+			inline LRSample32F operator*(float factor) const
 			{
 				return LRSample32F{Left * factor, Right * factor};
 			}
 
-			LRSample32F operator+(LRSample32F other) const
+			inline LRSample32F operator+(LRSample32F other) const
 			{
 				return LRSample32F{Left + other.Left, Right + other.Right};
 			}
 
-			LRSample32F operator-(LRSample32F other) const
+			inline LRSample32F operator-(LRSample32F other) const
 			{
 				return LRSample32F{Left - other.Left, Right - other.Right};
 			}
 
-			LRSample32F operator!() const
+			inline LRSample32F operator!() const
 			{
 				return LRSample32F{Left * -1.f, Right * -1.f};
 			}
@@ -47,21 +47,21 @@ namespace ByteFarm
 			float Right;
 			float Center;
 
-			LRCSample32F operator*(float factor) const
+			inline LRCSample32F operator*(float factor) const
 			{
 				return LRCSample32F{Left * factor, Right * factor, Center * factor};
 			}
 
-			LRCSample32F operator+(LRCSample32F other) const
+			inline LRCSample32F operator+(LRCSample32F other) const
 			{
 				return LRCSample32F{Left + other.Left, Right + other.Right, Center + other.Center};
 			}
 
-			LRCSample32F operator-(LRCSample32F other) const
+			inline LRCSample32F operator-(LRCSample32F other) const
 			{
 				return LRCSample32F{Left - other.Left, Right - other.Right, Center - other.Center};
 			}
-			LRCSample32F operator!() const
+			inline LRCSample32F operator!() const
 			{
 				return LRCSample32F{Left * -1.f, Right * -1.f, Center * -1.f};
 			}

@@ -25,7 +25,7 @@ namespace ByteFarm
 			{
 			}
 
-			void Increment() override
+			inline void Increment() override
 			{
 			}
 

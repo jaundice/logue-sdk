@@ -38,7 +38,7 @@ namespace ByteFarm
 				//_params = params;
 			}
 
-			void Increment() override
+			inline void Increment() override
 			{
 			}
 

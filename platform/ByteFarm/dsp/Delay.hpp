@@ -46,11 +46,11 @@ namespace ByteFarm
 			inline void Increment() override
 			{
 				_buffer.Increment();
-				for (int i = 0; i < _delayProcessors->Size(); i++)
+				for (int i = 0; i < NumDelayProcessors; i++)
 				{
 					_delayProcessors->Get(i)->Increment();
 				}
-				for (int j = 0; j < _feedbackProcessors->Size(); j++)
+				for (int j = 0; j < NumFeedbackProcessors; j++)
 				{
 					_feedbackProcessors->Get(j)->Increment();
 				}
@@ -60,13 +60,13 @@ namespace ByteFarm
 			{
 				LRSample32F s = sample.Clone();
 
-				for (int i = 0; i < _delayProcessors->Size(); i++)
+				for (int i = 0; i < NumDelayProcessors; i++)
 				{
 					s = _delayProcessors->Get(i)->Process(s);
 				}
 
 				LRSample32F echo = _buffer.Read((int32_t)(this->Params->TimeMs * -FramesPerMs)) * (0.45f * this->Params->Feedback);
-				for (int j = 0; j < _feedbackProcessors->Size(); j++)
+				for (int j = 0; j < NumFeedbackProcessors; j++)
 				{
 					echo = _feedbackProcessors->Get(j)->Process(echo);
 				}

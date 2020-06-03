@@ -43,7 +43,7 @@ namespace ByteFarm
 
 			float lfo;
 
-			float ProcessSample(float s)
+			inline float ProcessSample(float s)
 			{
 				return s * (c + ((1.f - this->Params->fb) * s)).real() * 3;
 			}

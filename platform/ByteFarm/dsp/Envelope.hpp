@@ -25,7 +25,7 @@ namespace ByteFarm
             return static_cast<EnvelopeStage>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
         }
 
-        bool HasFlag(EnvelopeStage stages, EnvelopeStage test)
+        inline bool HasFlag(EnvelopeStage stages, EnvelopeStage test)
         {
             return (stages & test) == test;
         }
